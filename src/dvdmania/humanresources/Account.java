@@ -1,27 +1,33 @@
-package dvdmania;
+package dvdmania.humanresources;
 
 import java.time.LocalDate;
 
 public class Account {
-    private int id;
+    private int idAcc;
     private String username;
     private String password;
     private LocalDate data_creat;
     private int priv;
+    private int idUtil;
 
     public Account() {
     }
 
-    public Account(int id, String username, String password, LocalDate data_creat, int priv) {
-        this.id = id;
+    public Account(int idAcc, String username, String password, LocalDate data_creat, int priv, int idUtil) {
+        this.idAcc = idAcc;
         this.username = username;
         this.password = password;
         this.data_creat = data_creat;
         this.priv = priv;
+        this.idUtil = idUtil;
     }
 
-    public int getId() {
-        return id;
+    public int getIdAcc() {
+        return idAcc;
+    }
+
+    public int getIdUtil() {
+        return idUtil;
     }
 
     public String getUsername() {
@@ -44,7 +50,9 @@ public class Account {
         this.priv = priv;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setIdAcc(int idAcc) {
+        this.idAcc = idAcc;
     }
+
+
 }

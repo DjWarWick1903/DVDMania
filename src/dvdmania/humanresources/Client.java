@@ -1,4 +1,4 @@
-package dvdmania;
+package dvdmania.humanresources;
 
 import java.time.LocalDate;
 
@@ -14,6 +14,7 @@ public class Client {
     private String email;
     private int loialitate;
 
+    //client cu email
     public Client(int id, String nume, String prenume, String adresa, String oras, LocalDate datan, String cnp, String tel, String email, int loialitate) {
         this.id = id;
         this.nume = nume;
@@ -27,6 +28,7 @@ public class Client {
         this.loialitate = loialitate;
     }
 
+    //client fara email
     public Client(int id, String nume, String prenume, String adresa, String oras, LocalDate datan, String cnp, String tel, int loialitate) {
         this.id = id;
         this.nume = nume;

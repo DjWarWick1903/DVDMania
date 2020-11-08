@@ -1,5 +1,3 @@
-package dvdmania;
-
 import java.sql.*;
 import java.util.ArrayList;
 
@@ -159,6 +157,7 @@ public class DataManip {
         return priviledge;
     }
 
+    //rescris
     void createClient(Utilizator util) {
         String sql = "INSERT INTO dvdmania.clienti (nume, pren, adresa, oras, datan, cnp, tel, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
@@ -184,6 +183,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void createEmployee(Utilizator util) {
 
         try {
@@ -577,6 +577,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void modifyClient(String id, String nume, String pren, String adresa, String oras, String datan, String cnp, String tel, String email, String util, String parola) {
         try {
             String sql = "UPDATE dvdmania.clienti SET nume=?, pren=?, adresa=?, oras=?, datan=?, cnp=?, tel=?, email=? WHERE id_cl='" + id + "'";
@@ -602,6 +603,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void modifyAngajat(String id, String nume, String pren, String adresa, String oras, String datan, String cnp, String tel, String email, String funct,
                        String sal, String store, String activ, String util, String parola) {
         try {
@@ -637,6 +639,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void createStore(String adresa, String oras, String tel) {
         try {
             String sql = "INSERT INTO dvdmania.magazin (adresa, oras, tel) VALUES (?, ?, ?)";
@@ -650,6 +653,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void modifyMagazin(String id, String adresa, String oras, String tel) {
         try {
             String sql = "UPDATE dvdmania.magazin SET adresa=?, oras=?, tel=? WHERE id_mag='" + id + "'";
@@ -664,6 +668,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void rewardClient(String cnp, boolean plus) {
         try {
             String sql;
@@ -754,6 +759,7 @@ public class DataManip {
         return res;
     }
 
+    //rescris
     String getFunctie(String cnp) {
         String rez = new String();
         try {
@@ -769,6 +775,7 @@ public class DataManip {
         return rez;
     }
 
+    //rescris
     String getEmail(String cnp) {
         String rez = new String();
         try {
@@ -1060,6 +1067,7 @@ public class DataManip {
         return produse;
     }
 
+    //rescris
     ArrayList<String[]> getStores() {
         String sql = "SELECT * FROM dvdmania.magazin";
         ArrayList<String[]> stores = new ArrayList<>();
@@ -1259,6 +1267,7 @@ public class DataManip {
         return customers;
     }
 
+    //rescris
     ArrayList<String[]> getEmployees() {
         ArrayList<String[]> employees = new ArrayList<>();
         try {
@@ -1291,6 +1300,7 @@ public class DataManip {
         return employees;
     }
 
+    //rescris
     ArrayList<String> getOrase() {
         ArrayList<String> orase = new ArrayList<>();
         try {

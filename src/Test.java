@@ -1,4 +1,4 @@
-package dvdmania;
+import dvdmania.humanresources.ConnectionManager;
 
 public class Test {
     public static void main(String[] args) {

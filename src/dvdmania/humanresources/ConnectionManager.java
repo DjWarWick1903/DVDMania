@@ -1,4 +1,4 @@
-package dvdmania;
+package dvdmania.humanresources;
 
 import java.io.*;
 import java.nio.file.FileSystems;

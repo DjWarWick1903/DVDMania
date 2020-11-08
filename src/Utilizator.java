@@ -1,5 +1,3 @@
-package dvdmania;
-
 public class Utilizator {
 
     //variabile clienti
