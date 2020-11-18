@@ -21,6 +21,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     boolean checkAccount(String user, String password) {
         String sql = "SELECT util, parola FROM dvdmania.conturi";
         boolean isCorrect = false;
@@ -215,6 +216,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void createAccount(Utilizator util, String username, String password, boolean client) {
 
         String sql;

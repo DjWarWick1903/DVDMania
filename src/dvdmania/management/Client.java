@@ -1,4 +1,4 @@
-package dvdmania.humanresources;
+package dvdmania.management;
 
 import java.time.LocalDate;
 

@@ -1,4 +1,4 @@
-package dvdmania.humanresources;
+package dvdmania.management;
 
 public class Store {
     private int id;

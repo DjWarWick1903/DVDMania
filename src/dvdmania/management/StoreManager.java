@@ -1,4 +1,6 @@
-package dvdmania.humanresources;
+package dvdmania.management;
+
+import dvdmania.tools.ConnectionManager;
 
 import java.sql.*;
 import java.util.LinkedList;

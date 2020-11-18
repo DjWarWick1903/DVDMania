@@ -1,4 +1,6 @@
-package dvdmania.humanresources;
+package dvdmania.management;
+
+import dvdmania.tools.ConnectionManager;
 
 import java.sql.*;
 
@@ -45,9 +47,44 @@ public class AccountManager {
         return newKey;
     }
 
-//    public int createEmployeeAccount(Employee employee) {
-//
-//    }
+    public int createEmployeeAccount(Account account) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        int newKey = 0;
+
+        boolean exists = checkAccountExists(account);
+
+        if (!exists) {
+            try {
+                connection = connMan.openConnection();
+                String sql = "INSERT INTO dvdmania.conturi (util, parola, data_creat, id_angaj) " +
+                        "VALUES(?,?,SYSDATE(),?)";
+                statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+                statement.setString(1, account.getUsername());
+                statement.setString(2, account.getPassword());
+                statement.setInt(3, account.getIdUtil());
+
+                int rowsInserted = statement.executeUpdate();
+                if (rowsInserted != 0) {
+                    ResultSet keySet = statement.getGeneratedKeys();
+                    if (keySet.next()) {
+                        newKey = keySet.getInt(1);
+                        account.setIdAcc(newKey);
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    connMan.closeConnection(connection, statement);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return newKey;
+    }
 
 
     public boolean checkAccountExists(Account account) {
