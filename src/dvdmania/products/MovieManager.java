@@ -3,10 +3,48 @@ package dvdmania.products;
 import dvdmania.tools.ConnectionManager;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class MovieManager {
 
     ConnectionManager connMan = new ConnectionManager();
+
+    public Movie getMovieByTitle(String title) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Movie movie = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_film, actor_pr, director, durata, gen, an, audienta FROM dvdmania.filme WHERE titlu=?";
+            connection.prepareStatement(sql);
+            statement.setString(1, title);
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int id = result.getInt("id_film");
+                String mainActor = result.getString("actor_pr");
+                String director = result.getString("director");
+                int duration = result.getInt("durata");
+                String genre = result.getString("gen");
+                String year = (String.valueOf(result.getDate("an"))).substring(0, 4);
+                int audience = result.getInt("audienta");
+
+                movie = new Movie(id, title, mainActor, director, duration, genre, year, audience);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return movie;
+    }
 
     public int createMovie(Movie movie) {
         Connection connection = null;
@@ -34,6 +72,12 @@ public class MovieManager {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         return rowsInserted;
@@ -58,6 +102,12 @@ public class MovieManager {
             rowsInserted = statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         return rowsInserted;
@@ -76,14 +126,42 @@ public class MovieManager {
             rowsDeleted = statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         return rowsDeleted;
     }
 
-//    public ArrayList<Movie> getMoviesForStore(Store store) {
-//        Connection connection = null;
-//        PreparedStatement statement = null;
-//        ArrayList<Movie> movies =
-//    }
+    public ArrayList<String> getGenres() {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet result = null;
+        ArrayList<String> genres = new ArrayList<>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT DISTINCT gen FROM dvdmania.filme";
+            result = statement.executeQuery(sql);
+
+            genres.add("Toate");
+            while (result.next()) {
+                genres.add(result.getString(1));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return genres;
+    }
 }

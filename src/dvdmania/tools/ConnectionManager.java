@@ -32,7 +32,7 @@ public class ConnectionManager {
         }
     }
 
-    public void closeConnection(Connection connection, PreparedStatement statement) throws SQLException {
+    public void closeConnection(Connection connection, Statement statement) throws SQLException {
         if (statement != null) {
             statement.close();
         }

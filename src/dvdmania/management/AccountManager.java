@@ -3,10 +3,51 @@ package dvdmania.management;
 import dvdmania.tools.ConnectionManager;
 
 import java.sql.*;
+import java.time.LocalDate;
 
 public class AccountManager {
 
     ConnectionManager connMan = new ConnectionManager();
+
+    public Account getAccount(String username, String password) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Account account = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_cont, data_creat, id_cl, id_angaj FROM dvdmania.conturi WHERE util=? AND parola=?";
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, username);
+            statement.setString(2, password);
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int id = result.getInt(1);
+                LocalDate date = result.getDate(2).toLocalDate();
+                int idClient = result.getInt(3);
+                int idEmployee = result.getInt(4);
+
+                if (idClient != 0) {
+                    account = new Account(id, username, password, date, 1, idClient);
+                } else if (idEmployee != 0) {
+                    account = new Account(id, username, password, date, 2, idClient);
+                }
+
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return account;
+    }
 
     public int createClientAccount(Account account) {
         Connection connection = null;
@@ -85,7 +126,6 @@ public class AccountManager {
 
         return newKey;
     }
-
 
     public boolean checkAccountExists(Account account) {
         Connection connection = null;

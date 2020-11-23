@@ -1,4 +1,80 @@
 package dvdmania.products;
 
+import dvdmania.tools.ConnectionManager;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+
 public class SongManager {
+
+    ConnectionManager connMan = new ConnectionManager();
+
+    public ArrayList<Song> getSongs(Album album) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        ArrayList<Song> songs = new ArrayList<>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_muzica, nume, durata FROM dvdmania.muzica WHERE id_album=?";
+            connection.prepareStatement(sql);
+            statement.setInt(1, album.getIdAlbum());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int id = result.getInt(1);
+                String name = result.getString(2);
+                int duration = result.getInt(3);
+                Song song = new Song(id, name, duration);
+                songs.add(song);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return songs;
+    }
+
+    public int CreateSong(Album album, Song song) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        int rowsInserted = 0;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "INSERT INTO dvdmania.muzica (nume, durata, id_album) VALUES (?, ?, ?)";
+            statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            statement.setString(1, song.getNume());
+            statement.setInt(2, song.getDuration());
+            statement.setInt(3, album.getIdAlbum());
+            rowsInserted = statement.executeUpdate();
+
+            if (rowsInserted != 0) {
+                ResultSet keys = statement.getGeneratedKeys();
+                if (keys.next()) {
+                    song.setIdSong(keys.getInt(1));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return rowsInserted;
+    }
 }

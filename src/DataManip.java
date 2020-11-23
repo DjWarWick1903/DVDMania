@@ -269,6 +269,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void createFilm(String titlu, String actor, String director, String durata, String gen, String an, String audienta, String magazin, String cant, String pret) {
         String sql = "INSERT INTO dvdmania.filme (titlu, actor_pr, director, durata, gen, an, audienta) VALUES (?, ?, ?, ?, ?, YEAR(?), ?)";
         try {
@@ -313,6 +314,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void createJoc(String titlu, String platforma, String developer, String publisher, String gen, String an, String audienta, String magazin, String cant, String pret) {
         String sql = "INSERT INTO dvdmania.jocuri (titlu, platforma, developer, publisher, gen, an, audienta) VALUES (?, ?, ?, ?, ?, YEAR(?), ?)";
         try {
@@ -356,6 +358,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void createAlbum(String titlu, String trupa, String melodii, String disc, String gen, String an, String magazin, String cant, String pret) {
         String sql = "INSERT INTO dvdmania.jocuri (titlu, trupa, nr_mel , casa_disc, gen, an) VALUES (?, ?, ?, ?, ?, YEAR(?))";
         try {
@@ -398,6 +401,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void createSong(String album, String nume, String durata) {
         try {
             ResultSet rs = statement.executeQuery("SELECT id_album FROM dvdmania.albume WHERE titlu='" + album + "'");
@@ -415,6 +419,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void modifyFilm(String id, String oras, String titlu, String actor_pr, String director, String durata, String gen, String an, String audienta, String cant, String pret) {
         try {
             String sql = "UPDATE dvdmania.filme SET titlu=?, actor_pr=?, director=?, durata=?, gen=?, an=YEAR(?), audienta=? WHERE id_film='" + id + "'";
@@ -444,6 +449,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void deleteFilm(String id, String oras) {
         try {
             String sql = "SELECT id_mag FROM dvdmania.magazin WHERE oras='" + oras + "'";
@@ -470,6 +476,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void modifyJoc(String id, String oras, String titlu, String platforma, String developer, String publisher, String an, String gen, String audienta, String cant, String pret) {
         try {
             String sql = "UPDATE dvdmania.jocuri SET titlu=?, platforma=?, developer=?, publisher=?, gen=?, an=YEAR(?), audienta=? WHERE id_joc='" + id + "'";
@@ -499,6 +506,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void deleteJoc(String id, String oras) {
         try {
             String sql = "SELECT id_mag FROM dvdmania.magazin WHERE oras='" + oras + "'";
@@ -525,6 +533,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void modifyAlbum(String id, String oras, String titlu, String trupa, String nr_mel, String casaDisc, String an, String gen, String cant, String pret) {
         try {
             String sql = "UPDATE dvdmania.albume SET titlu=?, trupa=?, nr_mel=?, casa_disc=?, gen=?, an=YEAR(?) WHERE id_album='" + id + "'";
@@ -553,6 +562,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     void deleteAlbum(String id, String oras) {
         try {
             String sql = "SELECT id_mag FROM dvdmania.magazin WHERE oras='" + oras + "'";
@@ -946,6 +956,7 @@ public class DataManip {
         return produs;
     }
 
+    //rescris
     ArrayList<String> getAlbume() {
         String sql = "SELECT titlu FROM dvdmania.albume";
         ArrayList<String> albume = new ArrayList<>();
@@ -1001,6 +1012,7 @@ public class DataManip {
         return detalii;
     }
 
+    //rescris
     ArrayList<String> getGen(String categorie) {
         ArrayList<String> gen = new ArrayList<String>();
         gen.add("Toate");
@@ -1044,6 +1056,7 @@ public class DataManip {
         return gen;
     }
 
+    //rescris
     ArrayList<String[]> getSongs(int id) {
         ArrayList<String[]> produse = new ArrayList<String[]>();
 
