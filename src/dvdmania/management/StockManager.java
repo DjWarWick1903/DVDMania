@@ -12,7 +12,8 @@ public class StockManager {
 
     ConnectionManager connMan = new ConnectionManager();
 
-    public Stock getMovieStock(Movie movie, Store store) {
+    //TODO: finish method
+    public Stock getStockById(int id) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet result = null;
@@ -20,7 +21,29 @@ public class StockManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "SELECT "
+            String sql = "SELECT id_film, id_joc, id_album, id_mag, cant, pret FROM produse " +
+                    "WHERE id_prod=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int idMovie = result.getInt(1);
+                int idGame = result.getInt(2);
+                int idAlbum = result.getInt(3);
+                int idStore = result.getInt(4);
+                int quantity = result.getInt(5);
+                int price = result.getInt(6);
+
+                stock = new Stock();
+                stock.setIdProduct(id);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+                stock.setIdMovie(idMovie);
+                stock.setIdStore(idStore);
+                stock.setIdGame(idGame);
+                stock.setIdAlbum(idAlbum);
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -30,6 +53,128 @@ public class StockManager {
                 e.printStackTrace();
             }
         }
+
+        return stock;
+    }
+
+    public Stock getMovieStock(Movie movie, Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Stock stock = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, cant, pret FROM produse " +
+                    "WHERE id_film=? AND id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, movie.getIdMovie());
+            statement.setInt(2, store.getId());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int idStock = result.getInt(1);
+                int quantity = result.getInt(2);
+                int price = result.getInt(3);
+
+                stock = new Stock();
+                stock.setIdProduct(idStock);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+                stock.setIdMovie(movie.getIdMovie());
+                stock.setIdStore(store.getId());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stock;
+    }
+
+    public Stock getGameStock(Game game, Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Stock stock = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, cant, pret FROM produse " +
+                    "WHERE id_joc=? AND id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, game.getIdGame());
+            statement.setInt(2, store.getId());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int idStock = result.getInt(1);
+                int quantity = result.getInt(2);
+                int price = result.getInt(3);
+
+                stock = new Stock();
+                stock.setIdProduct(idStock);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+                stock.setIdGame(game.getIdGame());
+                stock.setIdStore(store.getId());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stock;
+    }
+
+    public Stock getAlbumStock(Album album, Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Stock stock = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, cant, pret FROM produse " +
+                    "WHERE id_album=? AND id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, album.getIdAlbum());
+            statement.setInt(2, store.getId());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int idStock = result.getInt(1);
+                int quantity = result.getInt(2);
+                int price = result.getInt(3);
+
+                stock = new Stock();
+                stock.setIdProduct(idStock);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+                stock.setIdAlbum(album.getIdAlbum());
+                stock.setIdStore(store.getId());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stock;
     }
 
     public int insertMovieStock(Movie movie, Store store, int quantity, int price) {

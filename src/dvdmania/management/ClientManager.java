@@ -3,10 +3,91 @@ package dvdmania.management;
 import dvdmania.tools.ConnectionManager;
 
 import java.sql.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
 
 public class ClientManager {
 
     ConnectionManager connMan = new ConnectionManager();
+
+    public Client getClientById(int id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Client client = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT nume, pren, adresa, oras, datan, cnp, tel, email, loialitate FROM clienti " +
+                    "WHERE id_cl=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                String nume = result.getString("nume");
+                String prenume = result.getString("prenume");
+                String adress = result.getString("adresa");
+                String oras = result.getString("oras");
+                LocalDate date = result.getDate("datan").toLocalDate();
+                String cnp = result.getString("cnp");
+                String tel = result.getString("tel");
+                String email = result.getString("email");
+                int loyal = result.getInt("loialitate");
+
+                client = new Client(id, nume, prenume, adress, oras, date, cnp, tel, email, loyal);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return client;
+    }
+
+    public ArrayList<Client> getAllClients() {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet result = null;
+        ArrayList<Client> clientList = new ArrayList<>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_cl, nume, pren, adresa, oras, datan, cnp, tel, email, loialitate FROM clienti";
+            result = statement.executeQuery(sql);
+
+            while (result.next()) {
+                int id = result.getInt("id_cl");
+                String nume = result.getString("nume");
+                String prenume = result.getString("prenume");
+                String adress = result.getString("adresa");
+                String oras = result.getString("oras");
+                LocalDate date = result.getDate("datan").toLocalDate();
+                String cnp = result.getString("cnp");
+                String tel = result.getString("tel");
+                String email = result.getString("email");
+                int loyal = result.getInt("loialitate");
+
+                Client client = new Client(id, nume, prenume, adress, oras, date, cnp, tel, email, loyal);
+                clientList.add(client);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return clientList;
+    }
 
     public int createClient(Client client) {
         Connection connection = null;

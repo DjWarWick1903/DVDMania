@@ -1,5 +1,6 @@
 package dvdmania.products;
 
+import dvdmania.management.Store;
 import dvdmania.tools.ConnectionManager;
 
 import java.sql.*;
@@ -8,6 +9,81 @@ import java.util.ArrayList;
 public class AlbumManager {
 
     ConnectionManager connMan = null;
+
+    public ArrayList<Album> getAllAlbums() {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet result = null;
+        ArrayList<Album> albumList = new ArrayList<>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_album, trupa, titlu, nr_mel, casa_disc, gen, an FROM albume";
+            result = statement.executeQuery(sql);
+
+            while (result.next()) {
+                int id = result.getInt("id_album");
+                String artist = result.getString("trupa");
+                String title = result.getString("titlu");
+                int nrSongs = result.getInt("nr_mel");
+                String publisher = result.getString("casa_disc");
+                String genre = result.getString("gen");
+                String year = (String.valueOf(result.getDate("an"))).substring(0, 4);
+
+                Album album = new Album(id, artist, title, nrSongs, genre, publisher, year);
+                albumList.add(album);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return albumList;
+    }
+
+    public ArrayList<Album> getAlbumsByStore(Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        ArrayList<Album> albumList = new ArrayList<>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT a.id_album, a.trupa, a.titlu, a.nr_mel, a.casa_disc, a.gen, a.an FROM albume a " +
+                    "JOIN produse p ON a.id_album=p.id_album JOIN magazin m ON m.id_mag=p.id_mag WHERE m.id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, store.getId());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int id = result.getInt("id_album");
+                String artist = result.getString("trupa");
+                String title = result.getString("titlu");
+                int nrSongs = result.getInt("nr_mel");
+                String publisher = result.getString("casa_disc");
+                String genre = result.getString("gen");
+                String year = (String.valueOf(result.getDate("an"))).substring(0, 4);
+
+                Album album = new Album(id, artist, title, nrSongs, genre, publisher, year);
+                albumList.add(album);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return albumList;
+    }
 
     public Album getAlbumByTitle(String title) {
         Connection connection = null;

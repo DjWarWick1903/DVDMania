@@ -9,6 +9,39 @@ public class StoreManager {
 
     ConnectionManager connMan = new ConnectionManager();
 
+    public Store getStoreById(int id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Store store = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT adresa, oras, tel FROM magazin WHERE id_mag=?";
+            connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                String adress = result.getString(1);
+                String city = result.getString(2);
+                String tel = result.getString(3);
+
+                store = new Store(id, adress, city, tel);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return store;
+    }
+
     public Store getStoreByCity(String city) {
         Connection connection = null;
         PreparedStatement statement = null;

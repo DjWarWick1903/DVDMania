@@ -13,6 +13,7 @@ public class ConnectionManager {
 
         if (array[0] != null && array[1] != null && array[2] != null) {
             myConn = DriverManager.getConnection(array[0], array[1], array[2]);
+            //myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dvdmania", "root", "robertmaster1");
         }
 
         return myConn;

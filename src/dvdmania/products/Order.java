@@ -1,65 +1,64 @@
 package dvdmania.products;
 
+import dvdmania.management.Client;
+import dvdmania.management.Employee;
+import dvdmania.management.Stock;
+import dvdmania.management.Store;
+
 import java.time.LocalDate;
 
 public class Order {
-    int idAsset;
-    int idClient;
-    int idEmployee;
-    int idStore;
+    Stock stock;
+    Client client;
+    Employee employee;
+    Store store;
     LocalDate borrowDate;
     LocalDate returnDate;
     double price;
 
-    public Order(int idAsset, int idClient, int idEmployee, int idStore, LocalDate borrowDate, LocalDate returnDate, double price) {
-        this.idAsset = idAsset;
-        this.idClient = idClient;
-        this.idEmployee = idEmployee;
-        this.idStore = idStore;
+    public Order() {
+    }
+
+    public Order(Stock stock, Client client, Employee employee, Store store, LocalDate borrowDate, LocalDate returnDate, double price) {
+        this.stock = stock;
+        this.client = client;
+        this.employee = employee;
+        this.store = store;
         this.borrowDate = borrowDate;
         this.returnDate = returnDate;
         this.price = price;
     }
 
-    public Order(int idAsset, int idClient, int idEmployee, int idStore, LocalDate borrowDate, double price) {
-        this.idAsset = idAsset;
-        this.idClient = idClient;
-        this.idEmployee = idEmployee;
-        this.idStore = idStore;
-        this.borrowDate = borrowDate;
-        this.price = price;
+    public Stock getStock() {
+        return stock;
     }
 
-    public int getIdAsset() {
-        return idAsset;
+    public void setStock(Stock stock) {
+        this.stock = stock;
     }
 
-    public void setIdAsset(int idAsset) {
-        this.idAsset = idAsset;
+    public Client getClient() {
+        return client;
     }
 
-    public int getIdClient() {
-        return idClient;
+    public void setClient(Client client) {
+        this.client = client;
     }
 
-    public void setIdClient(int idClient) {
-        this.idClient = idClient;
+    public Employee getEmployee() {
+        return employee;
     }
 
-    public int getIdEmployee() {
-        return idEmployee;
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
     }
 
-    public void setIdEmployee(int idEmployee) {
-        this.idEmployee = idEmployee;
+    public Store getStore() {
+        return store;
     }
 
-    public int getIdStore() {
-        return idStore;
-    }
-
-    public void setIdStore(int idStore) {
-        this.idStore = idStore;
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     public LocalDate getBorrowDate() {

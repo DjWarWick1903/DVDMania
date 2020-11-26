@@ -1,5 +1,6 @@
 package dvdmania.products;
 
+import dvdmania.management.Store;
 import dvdmania.tools.ConnectionManager;
 
 import java.sql.*;
@@ -8,6 +9,83 @@ import java.util.ArrayList;
 public class MovieManager {
 
     ConnectionManager connMan = new ConnectionManager();
+
+    public ArrayList<Movie> getAllMovies() {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet result = null;
+        ArrayList<Movie> movieList = new ArrayList<>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_film, titlu, actor_pr, director, durata, gen, an, audienta FROM filme";
+            result = statement.executeQuery(sql);
+
+            while (result.next()) {
+                int id = result.getInt("id_film");
+                String title = result.getString("titlu");
+                String mainActor = result.getString("actor_pr");
+                String director = result.getString("director");
+                int duration = result.getInt("durata");
+                String genre = result.getString("gen");
+                int audience = result.getInt("audienta");
+                String year = (String.valueOf(result.getDate("an"))).substring(0, 4);
+
+                Movie movie = new Movie(id, title, mainActor, director, duration, genre, year, audience);
+                movieList.add(movie);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return movieList;
+    }
+
+    public ArrayList<Movie> getMovieByStore(Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        ArrayList<Movie> movieList = new ArrayList<>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT f.id_film, f.titlu, f.actor_pr, f.director, f.durata, f.gen, f.an, f.audienta FROM filme f " +
+                    "JOIN produse p ON p.id_film=f.id_film JOIN magazin m ON m.id_mag=p.id_mag WHERE m.id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, store.getId());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int id = result.getInt("id_film");
+                String title = result.getString("titlu");
+                String mainActor = result.getString("actor_pr");
+                String director = result.getString("director");
+                int duration = result.getInt("durata");
+                String genre = result.getString("gen");
+                int audience = result.getInt("audienta");
+                String year = (String.valueOf(result.getDate("an"))).substring(0, 4);
+
+                Movie movie = new Movie(id, title, mainActor, director, duration, genre, year, audience);
+                movieList.add(movie);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return movieList;
+    }
 
     public Movie getMovieByTitle(String title) {
         Connection connection = null;

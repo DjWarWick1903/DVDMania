@@ -44,6 +44,7 @@ public class DataManip {
         return isCorrect;
     }
 
+    //rescris
     int checkProduct(int id, String currentCategory, String oras) {
 
         String sql;
@@ -698,6 +699,7 @@ public class DataManip {
         }
     }
 
+    //rescris
     int returnOrder(String idProd, String cnp, String dataImp) {
         int rez = 0;
         try {
@@ -719,6 +721,7 @@ public class DataManip {
         return rez;
     }
 
+    //rescris
     String newOrder(String idProd, String idCl, String cnpAngaj, String cat) {
         String res = new String();
         try {
@@ -803,6 +806,7 @@ public class DataManip {
         return rez;
     }
 
+    //rescris
     ArrayList<String[]> getActiveOrders(String oras) {
         ArrayList<String[]> orders = new ArrayList<>();
         try {
@@ -825,6 +829,7 @@ public class DataManip {
         return orders;
     }
 
+    //rescris
     ArrayList<String[]> getAllOrders(String oras) {
 
         ArrayList<String[]> orders = new ArrayList<>();
@@ -851,6 +856,7 @@ public class DataManip {
         return orders;
     }
 
+    //rescris
     ArrayList<String[]> getAllOrdersClient(String cnp) {
         ArrayList<String[]> orders = new ArrayList<>();
 
@@ -875,6 +881,7 @@ public class DataManip {
         return orders;
     }
 
+    //rescris
     ArrayList<String> getProduct(String id, String cat, String oras) {
         int idMag = 0;
         ArrayList<String> produs = new ArrayList<>();
@@ -972,6 +979,7 @@ public class DataManip {
         return albume;
     }
 
+    //rescris
     ArrayList<String[]> getUser(String user, String password) {
         ArrayList<String[]> detalii = new ArrayList<>();
 
@@ -992,7 +1000,7 @@ public class DataManip {
                     rs.next();
 
                     detalii.add(new String[] {rs.getString(1), rs.getString(2), rs.getString(3), rs.getString(4), String.valueOf(rs.getDate(5)),
-                    rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9), Integer.toString(rs.getInt(10)), rs.getString(11)});
+                            rs.getString(6), rs.getString(7), rs.getString(8), rs.getString(9), Integer.toString(rs.getInt(10)), rs.getString(11)});
 
                 } else {
                     //client
@@ -1100,6 +1108,7 @@ public class DataManip {
         return stores;
     }
 
+    //rescris
     ArrayList<String[]> getProducts(String categorie, String magazin) {
         ArrayList<String[]> produse = new ArrayList<String[]>();
 
@@ -1251,6 +1260,7 @@ public class DataManip {
         return produse;
     }
 
+    //rescris
     ArrayList<String[]> getCustomers() {
         ArrayList<String[]> customers = new ArrayList<>();
         try {

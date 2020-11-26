@@ -6,14 +6,11 @@ public class Store {
     private String oras;
     private String telefon;
 
-    Store(int id, String adresa, String oras, String telefon) {
-        this.id = id;
-        this.adresa = adresa;
-        this.oras = oras;
-        this.telefon = telefon;
+    public Store() {
     }
 
-    Store(String adresa, String oras, String telefon) {
+    public Store(int id, String adresa, String oras, String telefon) {
+        this.id = id;
         this.adresa = adresa;
         this.oras = oras;
         this.telefon = telefon;

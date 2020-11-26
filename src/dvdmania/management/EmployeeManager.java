@@ -98,6 +98,50 @@ public class EmployeeManager {
         return rowsInserted;
     }
 
+    public Employee getEmployeeById(int id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Employee emp = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT a.nume, a.pren, a.adresa, a.oras, a.datan, " +
+                    "a.cnp, a.tel, a.email, a.functie, a.salariu, m.id_mag FROM dvdmania.angajati a, " +
+                    "dvdmania.magazin m WHERE m.id_mag=a.id_mag AND a.activ='Activ' AND a.id_angaj=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int idEmp = result.getInt("id_angaj");
+                String nume = result.getString("nume");
+                String prenume = result.getString("pren");
+                String adresa = result.getString("adresa");
+                String oras = result.getString("oras");
+                LocalDate datan = result.getDate("datan").toLocalDate();
+                String cnp = result.getString("cnp");
+                String telefon = result.getString("tel");
+                String email = result.getString("email");
+                String functie = result.getString("functie");
+                int salariu = result.getInt("salariu");
+                int idMag = result.getInt("id_mag");
+
+                emp = new Employee(idEmp, nume, prenume, adresa, oras, datan, cnp, telefon, email, functie, salariu, true, idMag);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return emp;
+    }
+
     public ArrayList<Employee> getEmployees() {
         ArrayList<Employee> employees = new ArrayList<>();
         Connection connection = null;
