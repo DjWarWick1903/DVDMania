@@ -107,14 +107,13 @@ public class EmployeeManager {
         try {
             connection = connMan.openConnection();
             String sql = "SELECT a.nume, a.pren, a.adresa, a.oras, a.datan, " +
-                    "a.cnp, a.tel, a.email, a.functie, a.salariu, m.id_mag FROM dvdmania.angajati a, " +
-                    "dvdmania.magazin m WHERE m.id_mag=a.id_mag AND a.activ='Activ' AND a.id_angaj=?";
+                    "a.cnp, a.tel, a.email, a.functie, a.salariu, m.id_mag FROM angajati a " +
+                    "JOIN magazin m ON m.id_mag=a.id_mag AND a.activ='Activ' AND a.id_angaj=?";
             statement = connection.prepareStatement(sql);
             statement.setInt(1, id);
             result = statement.executeQuery();
 
             while (result.next()) {
-                int idEmp = result.getInt("id_angaj");
                 String nume = result.getString("nume");
                 String prenume = result.getString("pren");
                 String adresa = result.getString("adresa");
@@ -127,7 +126,10 @@ public class EmployeeManager {
                 int salariu = result.getInt("salariu");
                 int idMag = result.getInt("id_mag");
 
-                emp = new Employee(idEmp, nume, prenume, adresa, oras, datan, cnp, telefon, email, functie, salariu, true, idMag);
+                emp = new Employee(id, nume, prenume, adresa, oras, datan, cnp, telefon, email, functie, salariu, true, idMag);
+                AccountManager accMan = new AccountManager();
+                Account account = accMan.getEmployeeAccount(emp);
+                emp.setAccount(account);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -169,6 +171,10 @@ public class EmployeeManager {
                 int salariu = result.getInt("salariu");
                 int idMag = result.getInt("id_mag");
                 Employee employee = new Employee(idEmp, nume, prenume, adresa, oras, datan, cnp, telefon, email, functie, salariu, true, idMag);
+
+                AccountManager accMan = new AccountManager();
+                Account account = accMan.getEmployeeAccount(employee);
+                employee.setAccount(account);
 
                 employees.add(employee);
             }
@@ -241,5 +247,27 @@ public class EmployeeManager {
         }
 
         return email;
+    }
+
+    public String[] employeeToRow(Employee employee) {
+        String[] row = new String[14];
+        row[0] = employee.getIdEmp() + "";
+        row[1] = employee.getNume();
+        row[2] = employee.getPrenume();
+        row[3] = employee.getAdresa();
+        row[4] = employee.getOras();
+        row[5] = employee.getDatan().toString();
+        row[6] = employee.getCnp();
+        row[7] = employee.getTelefon();
+        row[8] = employee.getEmail();
+        row[9] = employee.getFunctie();
+        row[10] = employee.getSalariu() + "";
+        StoreManager storeMan = new StoreManager();
+        Store store = storeMan.getStoreById(employee.getIdMag());
+        row[11] = store.getOras();
+        row[12] = employee.getAccount().getUsername();
+        row[13] = employee.getAccount().getPassword();
+
+        return row;
     }
 }

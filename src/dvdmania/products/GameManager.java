@@ -124,6 +124,43 @@ public class GameManager {
         return game;
     }
 
+    public Game getGameById(int id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Game game = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT titlu, an, platforma, developer, publisher, gen, audienta FROM dvdmania.jocuri WHERE id_joc=?";
+            connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                String title = result.getString("titlu");
+                String year = (String.valueOf(result.getDate("an"))).substring(0, 4);
+                String platform = result.getString("platforma");
+                String developer = result.getString("developer");
+                String publisher = result.getString("publisher");
+                String genre = result.getString("gen");
+                int audience = result.getInt("audienta");
+
+                game = new Game(id, title, year, platform, developer, publisher, genre, audience);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return game;
+    }
+
     public int createGame(Game game) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -240,5 +277,20 @@ public class GameManager {
         }
 
         return genres;
+    }
+
+    public String[] gameToRow(Game game, int price) {
+        String[] row = new String[9];
+        row[0] = game.getIdGame() + "";
+        row[1] = game.getTitle();
+        row[2] = game.getPlatform();
+        row[3] = game.getDeveloper();
+        row[4] = game.getPublisher();
+        row[5] = game.getGenre();
+        row[6] = game.getYear();
+        row[7] = game.getAudience() + "";
+        row[8] = price + "";
+
+        return row;
     }
 }

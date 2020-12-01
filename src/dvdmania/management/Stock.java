@@ -1,11 +1,15 @@
 package dvdmania.management;
 
+import dvdmania.products.Album;
+import dvdmania.products.Game;
+import dvdmania.products.Movie;
+
 public class Stock {
     private int idProduct;
-    private int idMovie;
-    private int idGame;
-    private int idAlbum;
-    private int idStore;
+    private Movie movie;
+    private Game game;
+    private Album album;
+    private Store store;
     private int quantity;
     private int price;
 
@@ -17,36 +21,36 @@ public class Stock {
         this.idProduct = idProduct;
     }
 
-    public int getIdMovie() {
-        return idMovie;
+    public Movie getMovie() {
+        return movie;
     }
 
-    public void setIdMovie(int idMovie) {
-        this.idMovie = idMovie;
+    public void setMovie(Movie movie) {
+        this.movie = movie;
     }
 
-    public int getIdGame() {
-        return idGame;
+    public Game getGame() {
+        return game;
     }
 
-    public void setIdGame(int idGame) {
-        this.idGame = idGame;
+    public void setGame(Game game) {
+        this.game = game;
     }
 
-    public int getIdAlbum() {
-        return idAlbum;
+    public Album getAlbum() {
+        return album;
     }
 
-    public void setIdAlbum(int idAlbum) {
-        this.idAlbum = idAlbum;
+    public void setAlbum(Album album) {
+        this.album = album;
     }
 
-    public int getIdStore() {
-        return idStore;
+    public Store getStore() {
+        return store;
     }
 
-    public void setIdStore(int idStore) {
-        this.idStore = idStore;
+    public void setStore(Store store) {
+        this.store = store;
     }
 
     public int getQuantity() {

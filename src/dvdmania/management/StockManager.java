@@ -3,16 +3,13 @@ package dvdmania.management;
 import dvdmania.products.*;
 import dvdmania.tools.ConnectionManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
 
 public class StockManager {
 
     ConnectionManager connMan = new ConnectionManager();
 
-    //TODO: finish method
     public Stock getStockById(int id) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -39,10 +36,19 @@ public class StockManager {
                 stock.setIdProduct(id);
                 stock.setQuantity(quantity);
                 stock.setPrice(price);
-                stock.setIdMovie(idMovie);
-                stock.setIdStore(idStore);
-                stock.setIdGame(idGame);
-                stock.setIdAlbum(idAlbum);
+                if (idMovie != 0) {
+                    MovieManager movieMan = new MovieManager();
+                    stock.setMovie(movieMan.getMovieById(idMovie));
+                } else if (idGame != 0) {
+                    GameManager gameMan = new GameManager();
+                    stock.setGame(gameMan.getGameById(idGame));
+                } else if (idAlbum != 0) {
+                    AlbumManager albumMan = new AlbumManager();
+                    stock.setAlbum(albumMan.getAlbumById(idAlbum));
+                }
+
+                StoreManager storeMan = new StoreManager();
+                stock.setStore(storeMan.getStoreById(idStore));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,6 +61,282 @@ public class StockManager {
         }
 
         return stock;
+    }
+
+    public ArrayList<Stock> getAllMovieStock() {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet result = null;
+        ArrayList<Stock> stockList = new ArrayList<>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, id_film, id_mag, cant, pret FROM produse WHERE id_film IS NOT NULL";
+            statement = connection.createStatement();
+            result = statement.executeQuery(sql);
+
+            while (result.next()) {
+                int idStock = result.getInt("id_prod");
+                int idMovie = result.getInt("id_film");
+                int idStore = result.getInt("id_mag");
+                int quantity = result.getInt("cant");
+                int price = result.getInt("pret");
+
+                Stock stock = new Stock();
+                stock.setIdProduct(idStock);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+                MovieManager movieMan = new MovieManager();
+                stock.setMovie(movieMan.getMovieById(idMovie));
+                StoreManager storeMan = new StoreManager();
+                stock.setStore(storeMan.getStoreById(idStore));
+
+                System.out.println(idStock);
+                System.out.println(idMovie);
+                System.out.println(idStore);
+                System.out.println(quantity);
+                System.out.println(price);
+                System.out.println(stock.getMovie() == null);
+                System.out.println("==================");
+                stockList.add(stock);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stockList;
+    }
+
+    public ArrayList<Stock> getAllAlbumStock() {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet result = null;
+        ArrayList<Stock> stockList = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, id_album, id_mag, cant, pret FROM produse";
+            statement = connection.createStatement();
+            result = statement.executeQuery(sql);
+
+            while (result.next()) {
+                int idStock = result.getInt("id_prod");
+                int idAlbum = result.getInt("id_album");
+                int idStore = result.getInt("id_mag");
+                int quantity = result.getInt("cant");
+                int price = result.getInt("pret");
+
+                Stock stock = new Stock();
+                stock.setIdProduct(idStock);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+                AlbumManager albumMan = new AlbumManager();
+                stock.setAlbum(albumMan.getAlbumById(idAlbum));
+                StoreManager storeMan = new StoreManager();
+                stock.setStore(storeMan.getStoreById(idStore));
+
+                SongManager songMan = new SongManager();
+                Album album = stock.getAlbum();
+                album.setSongs(songMan.getSongs(album.getIdAlbum()));
+
+                stockList.add(stock);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stockList;
+    }
+
+    public ArrayList<Stock> getAllGameStock() {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet result = null;
+        ArrayList<Stock> stockList = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, id_joc, id_mag, cant, pret FROM produse";
+            statement = connection.createStatement();
+            result = statement.executeQuery(sql);
+
+            while (result.next()) {
+                int idStock = result.getInt("id_prod");
+                int idGame = result.getInt("id_joc");
+                int idStore = result.getInt("id_mag");
+                int quantity = result.getInt("cant");
+                int price = result.getInt("pret");
+
+                Stock stock = new Stock();
+                stock.setIdProduct(idStock);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+                GameManager gameMan = new GameManager();
+                stock.setGame(gameMan.getGameById(idGame));
+                StoreManager storeMan = new StoreManager();
+                stock.setStore(storeMan.getStoreById(idStore));
+
+                stockList.add(stock);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stockList;
+    }
+
+    public ArrayList<Stock> getAllMovieStock(Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        ArrayList<Stock> stockList = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, id_film, id_mag, cant, pret FROM produse WHERE id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, store.getId());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int idStock = result.getInt("id_prod");
+                int idMovie = result.getInt("id_film");
+                int idStore = result.getInt("id_mag");
+                int quantity = result.getInt("cant");
+                int price = result.getInt("pret");
+
+                Stock stock = new Stock();
+                stock.setIdProduct(idStock);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+                MovieManager movieMan = new MovieManager();
+                stock.setMovie(movieMan.getMovieById(idMovie));
+                StoreManager storeMan = new StoreManager();
+                stock.setStore(storeMan.getStoreById(idStore));
+
+                stockList.add(stock);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stockList;
+    }
+
+    public ArrayList<Stock> getAllAlbumStock(Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        ArrayList<Stock> stockList = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, id_album, id_mag, cant, pret FROM produse WHERE id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, store.getId());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int idStock = result.getInt("id_prod");
+                int idAlbum = result.getInt("id_album");
+                int idStore = result.getInt("id_mag");
+                int quantity = result.getInt("cant");
+                int price = result.getInt("pret");
+
+                Stock stock = new Stock();
+                stock.setIdProduct(idStock);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+                AlbumManager albumMan = new AlbumManager();
+                stock.setAlbum(albumMan.getAlbumById(idAlbum));
+                StoreManager storeMan = new StoreManager();
+                stock.setStore(storeMan.getStoreById(idStore));
+
+                SongManager songMan = new SongManager();
+                Album album = stock.getAlbum();
+                album.setSongs(songMan.getSongs(album.getIdAlbum()));
+
+                stockList.add(stock);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stockList;
+    }
+
+    public ArrayList<Stock> getAllGameStock(Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        ArrayList<Stock> stockList = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, id_joc, id_mag, cant, pret FROM produse WHERE id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, store.getId());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int idStock = result.getInt("id_prod");
+                int idGame = result.getInt("id_joc");
+                int idStore = result.getInt("id_mag");
+                int quantity = result.getInt("cant");
+                int price = result.getInt("pret");
+
+                Stock stock = new Stock();
+                stock.setIdProduct(idStock);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+                GameManager gameMan = new GameManager();
+                stock.setGame(gameMan.getGameById(idGame));
+                StoreManager storeMan = new StoreManager();
+                stock.setStore(storeMan.getStoreById(idStore));
+
+                stockList.add(stock);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stockList;
     }
 
     public Stock getMovieStock(Movie movie, Store store) {
@@ -81,8 +363,8 @@ public class StockManager {
                 stock.setIdProduct(idStock);
                 stock.setQuantity(quantity);
                 stock.setPrice(price);
-                stock.setIdMovie(movie.getIdMovie());
-                stock.setIdStore(store.getId());
+                stock.setMovie(movie);
+                stock.setStore(store);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -121,8 +403,8 @@ public class StockManager {
                 stock.setIdProduct(idStock);
                 stock.setQuantity(quantity);
                 stock.setPrice(price);
-                stock.setIdGame(game.getIdGame());
-                stock.setIdStore(store.getId());
+                stock.setGame(game);
+                stock.setStore(store);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -161,8 +443,8 @@ public class StockManager {
                 stock.setIdProduct(idStock);
                 stock.setQuantity(quantity);
                 stock.setPrice(price);
-                stock.setIdAlbum(album.getIdAlbum());
-                stock.setIdStore(store.getId());
+                stock.setAlbum(album);
+                stock.setStore(store);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -467,6 +749,36 @@ public class StockManager {
         return stock;
     }
 
+    public int checkMovieStock(Movie movie, Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        int stock = 0;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT COUNT(*) FROM dvdmania.produse WHERE id_film=? AND id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, movie.getIdMovie());
+            statement.setInt(2, store.getId());
+            result = statement.executeQuery();
+
+            if (result.next()) {
+                stock = result.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stock;
+    }
+
     public int checkGameStock(Game game) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -496,6 +808,36 @@ public class StockManager {
         return stock;
     }
 
+    public int checkGameStock(Game game, Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        int stock = 0;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT COUNT(*) FROM dvdmania.produse WHERE id_joc=? AND id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, game.getIdGame());
+            statement.setInt(2, store.getId());
+            result = statement.executeQuery();
+
+            if (result.next()) {
+                stock = result.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stock;
+    }
+
     public int checkAlbumStock(Album album) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -507,6 +849,36 @@ public class StockManager {
             String sql = "SELECT COUNT(*) FROM dvdmania.produse WHERE id_album=?";
             statement = connection.prepareStatement(sql);
             statement.setInt(1, album.getIdAlbum());
+            result = statement.executeQuery();
+
+            if (result.next()) {
+                stock = result.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stock;
+    }
+
+    public int checkAlbumStock(Album album, Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        int stock = 0;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT COUNT(*) FROM dvdmania.produse WHERE id_album=? AND id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, album.getIdAlbum());
+            statement.setInt(2, store.getId());
             result = statement.executeQuery();
 
             if (result.next()) {

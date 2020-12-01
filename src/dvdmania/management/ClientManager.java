@@ -26,7 +26,7 @@ public class ClientManager {
 
             while (result.next()) {
                 String nume = result.getString("nume");
-                String prenume = result.getString("prenume");
+                String prenume = result.getString("pren");
                 String adress = result.getString("adresa");
                 String oras = result.getString("oras");
                 LocalDate date = result.getDate("datan").toLocalDate();
@@ -36,6 +36,10 @@ public class ClientManager {
                 int loyal = result.getInt("loialitate");
 
                 client = new Client(id, nume, prenume, adress, oras, date, cnp, tel, email, loyal);
+
+                AccountManager accMan = new AccountManager();
+                Account account = accMan.getClientAccount(client);
+                client.setAccount(account);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -74,6 +78,9 @@ public class ClientManager {
                 int loyal = result.getInt("loialitate");
 
                 Client client = new Client(id, nume, prenume, adress, oras, date, cnp, tel, email, loyal);
+                AccountManager accMan = new AccountManager();
+                Account account = accMan.getClientAccount(client);
+                client.setAccount(account);
                 clientList.add(client);
             }
         } catch (SQLException e) {
@@ -212,5 +219,23 @@ public class ClientManager {
         }
 
         return rowsUpdated;
+    }
+
+    public String[] clientToRow(Client client) {
+        String[] row = new String[12];
+        row[0] = client.getId() + "";
+        row[1] = client.getNume();
+        row[2] = client.getPrenume();
+        row[3] = client.getAdresa();
+        row[4] = client.getOras();
+        row[5] = client.getDatan().toString();
+        row[6] = client.getCnp();
+        row[7] = client.getTel();
+        row[8] = client.getEmail();
+        row[9] = client.getLoialitate() + "";
+        row[10] = client.getAccount().getUsername();
+        row[11] = client.getAccount().getPassword();
+
+        return row;
     }
 }

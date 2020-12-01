@@ -121,6 +121,42 @@ public class AlbumManager {
         return album;
     }
 
+    public Album getAlbumById(int id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Album album = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT titlu, trupa, nr_mel, casa_disc, gen, an FROM dvdmania.jocuri WHERE id_album=?";
+            connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                String title = result.getString("titlu");
+                String artist = result.getString("trupa");
+                int nrSongs = result.getInt("nr_mel");
+                String publisher = result.getString("casa_disc");
+                String genre = result.getString("gen");
+                String year = (String.valueOf(result.getDate("an"))).substring(0, 4);
+
+                album = new Album(id, artist, title, nrSongs, genre, publisher, year);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return album;
+    }
+
     public int createAlbum(Album album) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -265,5 +301,19 @@ public class AlbumManager {
         }
 
         return genres;
+    }
+
+    public String[] albumToRow(Album album, int price) {
+        String[] row = new String[8];
+        row[0] = album.getIdAlbum() + "";
+        row[1] = album.getArtist();
+        row[2] = album.getTitle();
+        row[3] = album.getProducer();
+        row[4] = album.getNrMel() + "";
+        row[5] = album.getGenre();
+        row[6] = album.getYear();
+        row[7] = price + "";
+
+        return row;
     }
 }

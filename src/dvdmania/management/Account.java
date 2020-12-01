@@ -26,20 +26,32 @@ public class Account {
         return idAcc;
     }
 
-    public int getIdUtil() {
-        return idUtil;
+    public void setIdAcc(int idAcc) {
+        this.idAcc = idAcc;
     }
 
     public String getUsername() {
         return username;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public String getPassword() {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public LocalDate getData_creat() {
         return data_creat;
+    }
+
+    public void setData_creat(LocalDate data_creat) {
+        this.data_creat = data_creat;
     }
 
     public int getPriv() {
@@ -50,9 +62,11 @@ public class Account {
         this.priv = priv;
     }
 
-    public void setIdAcc(int idAcc) {
-        this.idAcc = idAcc;
+    public int getIdUtil() {
+        return idUtil;
     }
 
-
+    public void setIdUtil(int idUtil) {
+        this.idUtil = idUtil;
+    }
 }

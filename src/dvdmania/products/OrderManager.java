@@ -343,4 +343,15 @@ public class OrderManager {
 
         return orderList;
     }
+
+    public String[] orderToRow(Order order) {
+        String[] row = new String[5];
+        row[0] = order.getClient().getNume();
+        row[1] = order.getClient().getPrenume();
+        row[2] = order.getClient().getCnp();
+        row[3] = order.getStock().getIdProduct() + "";
+        row[4] = order.getBorrowDate().toString();
+
+        return row;
+    }
 }

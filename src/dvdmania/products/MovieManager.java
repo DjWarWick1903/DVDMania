@@ -124,6 +124,43 @@ public class MovieManager {
         return movie;
     }
 
+    public Movie getMovieById(int id) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Movie movie = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT titlu, actor_pr, director, durata, gen, an, audienta FROM filme WHERE id_film=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, id);
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                String title = result.getString("titlu");
+                String mainActor = result.getString("actor_pr");
+                String director = result.getString("director");
+                int duration = result.getInt("durata");
+                String genre = result.getString("gen");
+                String year = (String.valueOf(result.getDate("an"))).substring(0, 4);
+                int audience = result.getInt("audienta");
+
+                movie = new Movie(id, title, mainActor, director, duration, genre, year, audience);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return movie;
+    }
+
     public int createMovie(Movie movie) {
         Connection connection = null;
         PreparedStatement statement = null;
@@ -224,6 +261,7 @@ public class MovieManager {
         try {
             connection = connMan.openConnection();
             String sql = "SELECT DISTINCT gen FROM dvdmania.filme";
+            statement = connection.createStatement();
             result = statement.executeQuery(sql);
 
             genres.add("Toate");
@@ -241,5 +279,20 @@ public class MovieManager {
         }
 
         return genres;
+    }
+
+    public String[] movieToRow(Movie movie, int price) {
+        String[] row = new String[9];
+        row[0] = movie.getIdMovie() + "";
+        row[1] = movie.getTitle();
+        row[2] = movie.getMainActor();
+        row[3] = movie.getDirector();
+        row[4] = movie.getDuration() + "";
+        row[5] = movie.getGenre();
+        row[6] = movie.getYear();
+        row[7] = movie.getAudience() + "";
+        row[8] = price + "";
+
+        return row;
     }
 }

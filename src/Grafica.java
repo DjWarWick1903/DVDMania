@@ -1,3 +1,6 @@
+import dvdmania.management.*;
+import dvdmania.products.*;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -5,14 +8,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Grafica {
     static class GUI extends JFrame {
 
         // constructorul interfetei grafice
-        GUI()
-        {
+        GUI() {
             super("Login");
             LoginPanel();
             NewAccountPanel();
@@ -20,19 +24,21 @@ public class Grafica {
         }
 
         // variabilele ce tin cont de privilegiile utilizatorului curent
-            // 0 - guest
-            // 1 - client
-            // 2 - vanzator
-            // 3 - admin
+        // 0 - guest
+        // 1 - client
+        // 2 - vanzator
+        // 3 - admin
         static int priv = 0;
 
-        //Initializare clasa baza de date
-        static DataManip bazaDate = new DataManip();
-        
+//        DataManip bazaDate = new DataManip();
+//        static Utilizator util;
+
         //Cache variabile
-        static ImageIcon imagePathLog = new ImageIcon(new ImageIcon("logo.png").getImage().getScaledInstance(120,130, Image.SCALE_DEFAULT));
+        static ImageIcon imagePathLog = new ImageIcon(new ImageIcon("logo.png").getImage().getScaledInstance(120, 130, Image.SCALE_DEFAULT));
         static JLabel imagine = new JLabel(imagePathLog);
-        static Utilizator util;
+        static Account account = null;
+        static Employee employee = null;
+        static Client client = null;
         static String categorieCurenta;
         static String magazinCurent;
 
@@ -54,8 +60,7 @@ public class Grafica {
 
         //componentele meniului din fereastra principala
         static JMenu fileMenu, editMenu, viewMenu;
-        static JMenuItem newOrder, finishOrder, logout, exit, newCustomer, newEmployee, newProduct, newStore
-                , editCustomer, editEmployee, editProduct, editStore,
+        static JMenuItem newOrder, finishOrder, logout, exit, newCustomer, newEmployee, newProduct, newStore, editCustomer, editEmployee, editProduct, editStore,
                 viewAllOrders, viewAccountDetails;
         static JMenuBar mb;
 
@@ -70,8 +75,8 @@ public class Grafica {
         static DefaultTableModel mainTableModel;
         static JScrollPane mainScrollPane;
         static ArrayList<String> mainCategoriesList;
-        static ArrayList<String[]> mainProduseList;
-        static ArrayList<String[]> mainStoresList;
+        static ArrayList<Stock> mainProduseList;
+        static ArrayList<Store> mainStoresList;
 
 
         //**Main Windows**
@@ -117,44 +122,40 @@ public class Grafica {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     String usrname = logUsernameText.getText();
-                    char[] pswrd = logPasswordText.getPassword();
-                    String fullPasswrd = String.valueOf(pswrd);
+                    String password = String.valueOf(logPasswordText.getPassword());
 
-                    if (bazaDate.checkAccount(usrname, fullPasswrd) == true) {
-                        int privGet = bazaDate.checkPriviledge(usrname, fullPasswrd);
+                    AccountManager accMan = new AccountManager();
+                    account = new Account();
+                    account.setUsername(usrname);
+                    account.setPassword(password);
 
-                        ArrayList<String[]> user = bazaDate.getUser(usrname, fullPasswrd);
-                        String[] usr;
+                    if (accMan.checkAccountExists(account)) {
+                        account = accMan.getAccount(usrname, password);
+                        priv = accMan.checkAccountPrivilege(account);
 
-                        switch(privGet) {
-                            case 1:
-                                usr = user.get(0);
-                                util = new Utilizator(usr[0], usr[1], usr[2], usr[3], usr[4], usr[5], usr[6], usr[7], Integer.parseInt(usr[8]));
-                                priv = 1;
-                                break;
-                            case 2:
-                                usr = user.get(0);
-                                util = new Utilizator(usr[0], usr[1], usr[2], usr[3], usr[4], usr[5], usr[6], usr[7], usr[8], usr[9], usr[10]);
-                                priv = 2;
-                                break;
-                            case 3:
-                                usr = user.get(0);
-                                util = new Utilizator(usr[0], usr[1], usr[2], usr[3], usr[4], usr[5], usr[6], usr[7], usr[8], usr[9], usr[10]);
-                                priv = 3;
+                        if (priv == 1) {
+                            ClientManager clientMan = new ClientManager();
+                            client = clientMan.getClientById(account.getIdUtil());
+                        } else if (priv == 2 || priv == 3) {
+                            EmployeeManager empMan = new EmployeeManager();
+                            employee = empMan.getEmployeeById(account.getIdUtil());
                         }
 
                         setVisible(false);
                         dispose();
                         JFrame welcomeDialog = new JFrame();
-                        JOptionPane.showMessageDialog(welcomeDialog, "Welcome, " + util.getNume() + " " + util.getPrenume() + "!");
+                        if (client != null) {
+                            JOptionPane.showMessageDialog(welcomeDialog, "Welcome, " + client.getNume() + " " + client.getPrenume() + "!", "Client", JOptionPane.INFORMATION_MESSAGE);
+                        } else if (employee != null) {
+                            JOptionPane.showMessageDialog(welcomeDialog, "Welcome, " + employee.getNume() + " " + employee.getPrenume() + "!", "Angajat", JOptionPane.INFORMATION_MESSAGE);
+                        }
 
                         setVisible(false);
                         dispose();
-                        changePanel(mainMainPanel,size[0],size[1]);
+                        changePanel(mainMainPanel, size[0], size[1]);
                         MenuBar();
                         setTitle("DVDMania");
-                    }
-                    else {
+                    } else {
                         JFrame warningDialog = new JFrame();
                         JOptionPane.showMessageDialog(warningDialog, "Account not found!", "Error", JOptionPane.WARNING_MESSAGE);
                     }
@@ -192,7 +193,7 @@ public class Grafica {
                 }
             });
         }
-        
+
         private void NewAccountPanel() {
             //Username
             newUserLabel = new JLabel();
@@ -322,24 +323,37 @@ public class Grafica {
                     String month = newBirthMonthText.getText();
                     String day = newBirthDayText.getText();
 
-                    if(username.equals("") || password.equals("") || email.equals("") || firstName.equals("") || lastName.equals("") || address.equals("") || city.equals("")
-                    || cnp.equals("") || phone.equals("") || year.equals("") || month.equals("") || day.equals("")) {
+                    boolean isValid = username.equals("") || password.equals("") || email.equals("") || firstName.equals("") || lastName.equals("") || address.equals("") || city.equals("")
+                            || cnp.equals("") || phone.equals("") || year.equals("") || month.equals("") || day.equals("");
+
+                    if (isValid) {
                         JFrame warningDialog = new JFrame();
                         JOptionPane.showMessageDialog(warningDialog, "You must complete all fields!", "Warning", JOptionPane.WARNING_MESSAGE);
-                    }
-                    else {
+                    } else {
                         String birthdate = new String(year + "-" + month + "-" + day);
-                        util = new Utilizator(firstName, lastName, address, city, birthdate, cnp, phone, email, 5);
+                        LocalDate date = LocalDate.parse(birthdate);
 
-                        bazaDate.createClient(util);
-                        bazaDate.createAccount(util, username, password, true);
+                        client = new Client(0, lastName, firstName, address, city, date, cnp, phone, email, 5);
+                        priv = 1;
 
-                        JFrame confirmDialog = new JFrame();
-                        JOptionPane.showMessageDialog(confirmDialog, "Your account has successfully been created!");
+                        ClientManager clientMan = new ClientManager();
+                        AccountManager accMan = new AccountManager();
 
-                        changePanel(mainMainPanel,size[0], size[1]);
-                        MenuBar();
-                        setTitle("DVDMania");
+                        int clientInserted = clientMan.createClient(client);
+                        account = new Account(0, username, password, null, 1, client.getId());
+                        int accountInserted = accMan.createClientAccount(account);
+
+                        if (clientInserted != 0 && accountInserted != 0) {
+                            JFrame confirmDialog = new JFrame();
+                            JOptionPane.showMessageDialog(confirmDialog, "Your account has successfully been created!");
+
+                            changePanel(mainMainPanel, size[0], size[1]);
+                            MenuBar();
+                            setTitle("DVDMania");
+                        } else {
+                            JFrame warningDialog = new JFrame();
+                            JOptionPane.showMessageDialog(warningDialog, "There was a problem in creating your profile.", "Warning", JOptionPane.WARNING_MESSAGE);
+                        }
                     }
                 }
             });
@@ -565,8 +579,13 @@ public class Grafica {
             mainJocuriButton = new JButton("Jocuri");
             mainAlbumeButton = new JButton("Muzica");
 
-            mainCategoriesList = bazaDate.getGen("Filme");
-            mainStoresList =  bazaDate.getStores();
+            MovieManager movieMan = new MovieManager();
+            StoreManager storeMan = new StoreManager();
+            SongManager songMan = new SongManager();
+            StockManager stockMan = new StockManager();
+
+            mainCategoriesList = movieMan.getGenres();
+            mainStoresList = storeMan.getStores();
             mainCategoryModel = new DefaultComboBoxModel(mainCategoriesList.toArray());
             mainCategoryBox = new JComboBox(mainCategoryModel);
             mainStoreBox = new JComboBox(storeListToBox(mainStoresList));
@@ -575,8 +594,8 @@ public class Grafica {
             mainStoreBox.setBorder(BorderFactory.createTitledBorder("Magazine:"));
 
             mainButtonsPanel = new JPanel();
-            mainButtonsPanel.setLayout(new GridLayout(5,1));
-            mainButtonsPanel.setPreferredSize(new Dimension(120,600));
+            mainButtonsPanel.setLayout(new GridLayout(5, 1));
+            mainButtonsPanel.setPreferredSize(new Dimension(120, 600));
             mainButtonsPanel.add(mainFilmeButton);
             mainButtonsPanel.add(mainJocuriButton);
             mainButtonsPanel.add(mainAlbumeButton);
@@ -587,12 +606,12 @@ public class Grafica {
             mainSearchField = new JTextField("Cautare");
             categorieCurenta = "Filme";
             magazinCurent = "Toate";
-            mainProduseList = bazaDate.getProducts("Filme", "Toate");
+            mainProduseList = stockMan.getAllMovieStock();
             mainProdTable = initializeTable(mainProduseList);
             mainScrollPane = new JScrollPane(mainProdTable);
             mainSearchButton = new JButton("Cauta");
             mainCheckButton = new JButton("Verifica valabilitatea");
-            mainCategoriesList = bazaDate.getGen("Filme");
+            mainCategoriesList = movieMan.getGenres();
 
             mainSearchPanel = new JPanel();
             mainSearchPanel.setLayout(new BorderLayout());
@@ -619,7 +638,7 @@ public class Grafica {
                     if(e.getClickCount() == 2 && table.getSelectedRow() != -1 && categorieCurenta.equals("Albume")) {
                         int id = Integer.parseInt(String.valueOf(mainProdTable.getValueAt(mainProdTable.getSelectedRow(), 0)));
                         String titlu = new String(mainProdTable.getValueAt(mainProdTable.getSelectedRow(), 2) + " - " + mainProdTable.getValueAt(mainProdTable.getSelectedRow(), 1));
-                        ArrayList<String[]> songs = bazaDate.getSongs(id);
+                        ArrayList<Song> songs = songMan.getSongs(id);
                         JFrame songsWindow = new JFrame();
 
                         DefaultTableModel songModel = new DefaultTableModel() {
@@ -632,7 +651,8 @@ public class Grafica {
                         songModel.setColumnIdentifiers(columns);
 
                         for(int i = 0; i < songs.size(); i++) {
-                            songModel.addRow(songs.get(i));
+                            String[] song = {songs.get(i).getNume(), "" + songs.get(i).getDuration()};
+                            songModel.addRow(song);
                         }
 
                         JTable list = new JTable();
@@ -665,8 +685,35 @@ public class Grafica {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
+                        StoreManager storeMan = new StoreManager();
+                        StockManager stockMan = new StockManager();
+
                         String selectedStore = mainStoreBox.getSelectedItem().toString();
-                        mainProduseList = bazaDate.getProducts(categorieCurenta, selectedStore);
+                        switch (categorieCurenta) {
+                            case "Filme":
+                                if (!selectedStore.equals("Toate")) {
+                                    Store store = storeMan.getStoreByCity(selectedStore);
+                                    mainProduseList = stockMan.getAllMovieStock(store);
+                                } else {
+                                    mainProduseList = stockMan.getAllMovieStock();
+                                }
+                                break;
+                            case "Jocuri":
+                                if (!selectedStore.equals("Toate")) {
+                                    Store store = storeMan.getStoreByCity(selectedStore);
+                                    mainProduseList = stockMan.getAllGameStock(store);
+                                } else {
+                                    mainProduseList = stockMan.getAllGameStock();
+                                }
+                                break;
+                            case "Albume":
+                                if (!selectedStore.equals("Toate")) {
+                                    Store store = storeMan.getStoreByCity(selectedStore);
+                                    mainProduseList = stockMan.getAllAlbumStock(store);
+                                } else {
+                                    mainProduseList = stockMan.getAllAlbumStock();
+                                }
+                        }
                         mainProdTable.setModel(updateList(mainCategoryBox.getSelectedItem().toString(), mainProduseList, categorieCurenta));
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -681,7 +728,8 @@ public class Grafica {
                     updateComboBox("Filme");
                     mainCategoryBox.setSelectedItem("Toate");
                     mainStoreBox.setSelectedItem("Toate");
-                    mainProduseList = bazaDate.getProducts("Filme", "Toate");
+                    StockManager stockMan = new StockManager();
+                    mainProduseList = stockMan.getAllMovieStock();
                     mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
                 }
             });
@@ -693,7 +741,8 @@ public class Grafica {
                     updateComboBox("Jocuri");
                     mainCategoryBox.setSelectedItem("Toate");
                     mainStoreBox.setSelectedItem("Toate");
-                    mainProduseList = bazaDate.getProducts("Jocuri", "Toate");
+                    StockManager stockMan = new StockManager();
+                    mainProduseList = stockMan.getAllGameStock();
                     mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
                 }
             });
@@ -705,7 +754,8 @@ public class Grafica {
                     updateComboBox("Muzica");
                     mainCategoryBox.setSelectedItem("Toate");
                     mainStoreBox.setSelectedItem("Toate");
-                    mainProduseList = bazaDate.getProducts("Albume", "Toate");
+                    StockManager stockMan = new StockManager();
+                    mainProduseList = stockMan.getAllAlbumStock();
                     mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
                 }
             });
@@ -718,13 +768,38 @@ public class Grafica {
                             JFrame warningDialog = new JFrame();
                             JOptionPane.showMessageDialog(warningDialog, "Alegeti mai intai un produs din lista!", "Eroare", JOptionPane.WARNING_MESSAGE);
                         } else {
-                            //Object id = mainProdTable.getValueAt(mainProdTable.getSelectedRow(), 0);
                             int id = Integer.parseInt(String.valueOf(mainProdTable.getValueAt(mainProdTable.getSelectedRow(), 0)));
-                            int nrTot = bazaDate.checkProduct(id, categorieCurenta, util.getOras());
-                            if(nrTot > 0) {
+                            int nrTot = 0;
+                            StockManager stockMan = new StockManager();
+                            StoreManager storeMan = new StoreManager();
+                            Store store;
+                            switch (categorieCurenta) {
+                                case "Filme":
+                                    MovieManager movieMan = new MovieManager();
+
+                                    Movie movie = movieMan.getMovieById(id);
+                                    store = storeMan.getStoreByCity(client.getOras());
+                                    nrTot = stockMan.checkMovieStock(movie, store);
+                                    break;
+                                case "Jocuri":
+                                    GameManager gameMan = new GameManager();
+
+                                    Game game = gameMan.getGameById(id);
+                                    store = storeMan.getStoreByCity(client.getOras());
+                                    nrTot = stockMan.checkGameStock(game, store);
+                                    break;
+                                case "Albume":
+                                    AlbumManager albumMan = new AlbumManager();
+
+                                    Album album = albumMan.getAlbumById(id);
+                                    store = storeMan.getStoreByCity(client.getOras());
+                                    nrTot = stockMan.checkAlbumStock(album, store);
+                            }
+
+                            if (nrTot > 0) {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Vesti bune! \n Mai sunt " + nrTot + " copii ale acestui produs in magazin!");
-                            } else if(nrTot == -1){
+                            } else if (nrTot == 0) {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Ne pare rau, dar acest produs nu exista in magazinul orasului dumneavoastra!");
                             } else {
@@ -744,48 +819,71 @@ public class Grafica {
                 public void actionPerformed(ActionEvent e) {
                     mainCategoryBox.setSelectedItem("Toate");
                     mainStoreBox.setSelectedItem("Toate");
-                    ArrayList<String[]> newProduseList = new ArrayList<>();
+                    ArrayList<Stock> newProduseList = new ArrayList<>();
 
                     if(!mainSearchField.equals("Cautare")) {
-                        if(categorieCurenta.equals("Filme")) {
-                            String toSearch = mainSearchField.getText();
+                        String toSearch = mainSearchField.getText();
+                        Stock stock = null;
+                        switch (categorieCurenta) {
+                            case "Filme":
+                                for (int i = 0; i < mainProduseList.size(); i++) {
+                                    stock = mainProduseList.get(i);
+                                    Movie movie = stock.getMovie();
 
-                            for(int i = 0; i < mainProduseList.size(); i++) {
-                                for(int j = 1; j <= 3; j++) {
-                                    String search = mainProduseList.get(i)[j];
-                                    if(search.toLowerCase().contains(toSearch.trim().toLowerCase())) {
-                                        newProduseList.add(mainProduseList.get(i));
-                                        break;
+                                    String title = movie.getTitle();
+                                    String actor = movie.getMainActor();
+                                    String director = movie.getDirector();
+
+                                    if (title.toLowerCase().contains(toSearch.trim().toLowerCase())) {
+                                        newProduseList.add(stock);
+                                    } else if (actor.toLowerCase().contains(toSearch.trim().toLowerCase())) {
+                                        newProduseList.add(stock);
+                                    } else if (director.toLowerCase().contains(toSearch.trim().toLowerCase())) {
+                                        newProduseList.add(stock);
                                     }
                                 }
-                            }
-                        } else if(categorieCurenta.equals("Jocuri")) {
-                            String toSearch = mainSearchField.getText();
+                                break;
+                            case "Jocuri":
+                                for (int i = 0; i < mainProduseList.size(); i++) {
+                                    stock = mainProduseList.get(i);
+                                    Game game = stock.getGame();
 
-                            for(int i = 0; i < mainProduseList.size(); i++) {
-                                for(int j = 1; j <= 4; j++) {
-                                    String search = mainProduseList.get(i)[j];
-                                    if(search.toLowerCase().contains(toSearch.trim().toLowerCase())) {
-                                        newProduseList.add(mainProduseList.get(i));
-                                        break;
+                                    String title = game.getTitle();
+                                    String platform = game.getPlatform();
+                                    String developer = game.getDeveloper();
+                                    String publisher = game.getPublisher();
+
+                                    if (title.toLowerCase().contains(toSearch.trim().toLowerCase())) {
+                                        newProduseList.add(stock);
+                                    } else if (platform.toLowerCase().contains(toSearch.trim().toLowerCase())) {
+                                        newProduseList.add(stock);
+                                    } else if (developer.toLowerCase().contains(toSearch.trim().toLowerCase())) {
+                                        newProduseList.add(stock);
+                                    } else if (publisher.toLowerCase().contains(toSearch.trim().toLowerCase())) {
+                                        newProduseList.add(stock);
                                     }
                                 }
-                            }
-                        } else if(categorieCurenta.equals("Albume")) {
-                            String toSearch = mainSearchField.getText();
+                                break;
+                            case "Albume":
+                                for (int i = 0; i < mainProduseList.size(); i++) {
+                                    stock = mainProduseList.get(i);
+                                    Album album = stock.getAlbum();
 
-                            for(int i = 0; i < mainProduseList.size(); i++) {
-                                for(int j = 1; j <= 3; j++) {
-                                    String search = mainProduseList.get(i)[j];
-                                    if(search.toLowerCase().contains(toSearch.trim().toLowerCase())) {
-                                        newProduseList.add(mainProduseList.get(i));
-                                        break;
+                                    String title = album.getTitle();
+                                    String artist = album.getArtist();
+                                    String producer = album.getProducer();
+
+                                    if (title.toLowerCase().contains(toSearch.trim().toLowerCase())) {
+                                        newProduseList.add(stock);
+                                    } else if (artist.toLowerCase().contains(toSearch.trim().toLowerCase())) {
+                                        newProduseList.add(stock);
+                                    } else if (producer.toLowerCase().contains(toSearch.trim().toLowerCase())) {
+                                        newProduseList.add(stock);
                                     }
                                 }
-                            }
                         }
 
-                        if(newProduseList.isEmpty()) {
+                        if (newProduseList.isEmpty()) {
                             JFrame warningDialog = new JFrame();
                             JOptionPane.showMessageDialog(warningDialog, "Nu am putut gasi nimic!", "Warning", JOptionPane.WARNING_MESSAGE);
                         } else {
@@ -906,7 +1004,15 @@ public class Grafica {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
                             } else {
-                                bazaDate.createFilm(titlu, actor, director, durata, gen, an, audienta, util.getOras(), cant, pret);
+                                MovieManager movieMan = new MovieManager();
+                                StockManager stockMan = new StockManager();
+                                StoreManager storeMan = new StoreManager();
+
+                                Movie movie = new Movie(0, titlu, actor, director, Integer.parseInt(durata), gen, an, Integer.parseInt(audienta));
+                                Store store = storeMan.getStoreByCity(employee.getOras());
+
+                                movieMan.createMovie(movie);
+                                stockMan.insertMovieStock(movie, store, Integer.parseInt(cant), Integer.parseInt(pret));
                             }
                         }
                     });
@@ -999,7 +1105,15 @@ public class Grafica {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
                             } else {
-                                bazaDate.createJoc(titlu, platforma, developer, publisher, gen, an, audienta, util.getOras(), cant, pret);
+                                GameManager gameMan = new GameManager();
+                                StockManager stockMan = new StockManager();
+                                StoreManager storeMan = new StoreManager();
+
+                                Game game = new Game(0, titlu, platforma, developer, publisher, gen, an, Integer.parseInt(audienta));
+                                Store store = storeMan.getStoreByCity(employee.getOras());
+
+                                gameMan.createGame(game);
+                                stockMan.insertGameStock(game, store, Integer.parseInt(cant), Integer.parseInt(pret));
                             }
                         }
                     });
@@ -1087,7 +1201,15 @@ public class Grafica {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
                             } else {
-                                bazaDate.createAlbum(titlu, trupa, melodii, casaDisc, gen, an, util.getOras(), cant, pret);
+                                AlbumManager albumMan = new AlbumManager();
+                                StockManager stockMan = new StockManager();
+                                StoreManager storeMan = new StoreManager();
+
+                                Album album = new Album(0, titlu, trupa, Integer.parseInt(melodii), casaDisc, gen, an);
+                                Store store = storeMan.getStoreByCity(employee.getOras());
+
+                                albumMan.createAlbum(album);
+                                stockMan.insertAlbumStock(album, store, Integer.parseInt(cant), Integer.parseInt(pret));
                             }
                         }
                     });
@@ -1115,14 +1237,21 @@ public class Grafica {
                     newSongDurataLabel = new JLabel("Durata:");
                     newSongDurataField = new JTextField();
                     newSongAlbumLabel = new JLabel("Album");
-                    ArrayList<String> albume = bazaDate.getAlbume();
+                    AlbumManager albumMan = new AlbumManager();
+                    ArrayList<Album> albume = albumMan.getAllAlbums();
+                    ArrayList<String> numeAlbume = new ArrayList<>();
+                    Iterator iterator = albume.iterator();
+                    while (iterator.hasNext()) {
+                        Album album = (Album) iterator.next();
+                        numeAlbume.add(album.getTitle());
+                    }
                     newSongAlbumBox = new JComboBox(albume.toArray());
                     save = new JButton("Save");
                     exit = new JButton("Exit");
 
                     JFrame newSongWindow = new JFrame();
-                    JPanel detaliiPanel = new JPanel(new GridLayout(3,3,5,5));
-                    JPanel butoanePanel = new JPanel(new GridLayout(1,2,5,5));
+                    JPanel detaliiPanel = new JPanel(new GridLayout(3, 3, 5, 5));
+                    JPanel butoanePanel = new JPanel(new GridLayout(1, 2, 5, 5));
                     JPanel newSongMain = new JPanel(new BorderLayout());
                     detaliiPanel.add(newSongAlbumLabel);
                     detaliiPanel.add(newSongAlbumBox);
@@ -1143,16 +1272,25 @@ public class Grafica {
                     save.addActionListener(new ActionListener() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            String album, nume, durata;
-                            album = String.valueOf(newSongAlbumBox.getSelectedItem());
+                            String albumName, nume, durata;
+                            albumName = String.valueOf(newSongAlbumBox.getSelectedItem());
                             nume = newSongNumeField.getText();
                             durata = newSongDurataField.getText();
 
-                            if(nume.isEmpty() || durata.isEmpty()) {
+                            if (nume.isEmpty() || durata.isEmpty()) {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
                             } else {
-                                bazaDate.createSong(album, nume, durata);
+                                SongManager songMan = new SongManager();
+                                Iterator iterator = albume.iterator();
+                                while (iterator.hasNext()) {
+                                    Album album = (Album) iterator.next();
+                                    if (album.getTitle().equals(albumName)) {
+                                        Song song = new Song(0, nume, Integer.parseInt(durata));
+                                        songMan.CreateSong(album, song);
+                                        break;
+                                    }
+                                }
                             }
                         }
                     });
@@ -1209,6 +1347,10 @@ public class Grafica {
                 public void actionPerformed(ActionEvent e) {
                     JButton save, exit, delete;
                     JPanel secondWindowMain, secondWindowDetalii, secondWindowButoane;
+                    StockManager stockMan = new StockManager();
+                    MovieManager movieMan = new MovieManager();
+                    GameManager gameMan = new GameManager();
+                    AlbumManager albumMan = new AlbumManager();
 
                     if (editCategorieBox.getSelectedItem().equals("Filme")) {
                         JLabel editProdTitluLabel, editProdActorLabel, editProdDirectorLabel, editProdDurataLabel, editProdGenLabel, editProdAnLabel, editProdAudientaLabel,
@@ -1216,38 +1358,44 @@ public class Grafica {
                         JTextField editProdTitluField, editProdActorField, editProdDirectorField, editProdDurataField, editProdGenField, editProdAnField, editProdAudientaField,
                                 editProdCantField, editProdPretField;
 
-                        ArrayList<String> produs = bazaDate.getProduct(editIDField.getText(), String.valueOf(editCategorieBox.getSelectedItem()), util.getOras());
-                        if (produs.isEmpty()) {
+                        Movie movie = new Movie();
+                        movie.setIdMovie(Integer.parseInt(editIDField.getText()));
+                        Store store = new Store();
+                        store.setId(employee.getIdMag());
+                        Stock stock = stockMan.getMovieStock(movie, store);
+                        stock.setMovie(movieMan.getMovieById(movie.getIdMovie()));
+                        movie = stock.getMovie();
+                        if (stock == null) {
                             JFrame dialog = new JFrame();
                             JOptionPane.showMessageDialog(dialog, "ID-ul introdus nu exista in baza de date", "Warning", JOptionPane.WARNING_MESSAGE);
                         } else {
                             editProdTitluLabel = new JLabel("Titlu:");
                             editProdTitluField = new JTextField();
-                            editProdTitluField.setText(produs.get(0));
+                            editProdTitluField.setText(movie.getTitle());
                             editProdActorLabel = new JLabel("Actor:");
                             editProdActorField = new JTextField();
-                            editProdActorField.setText(produs.get(1));
+                            editProdActorField.setText(movie.getMainActor());
                             editProdDirectorLabel = new JLabel("Director:");
                             editProdDirectorField = new JTextField();
-                            editProdDirectorField.setText(produs.get(2));
+                            editProdDirectorField.setText(movie.getDirector());
                             editProdDurataLabel = new JLabel("Durata:");
                             editProdDurataField = new JTextField();
-                            editProdDurataField.setText(produs.get(3));
+                            editProdDurataField.setText(movie.getDuration() + "");
                             editProdGenLabel = new JLabel("Gen:");
                             editProdGenField = new JTextField();
-                            editProdGenField.setText(produs.get(4));
+                            editProdGenField.setText(movie.getGenre());
                             editProdAnLabel = new JLabel("An:");
                             editProdAnField = new JTextField();
-                            editProdAnField.setText(produs.get(5));
+                            editProdAnField.setText(movie.getYear());
                             editProdAudientaLabel = new JLabel("Audienta:");
                             editProdAudientaField = new JTextField();
-                            editProdAudientaField.setText(produs.get(6));
+                            editProdAudientaField.setText(movie.getAudience() + "");
                             editProdCantLabel = new JLabel("Cantitate:");
                             editProdCantField = new JTextField();
-                            editProdCantField.setText(produs.get(7));
+                            editProdCantField.setText(stock.getQuantity() + "");
                             editProdPretLabel = new JLabel("Pret:");
                             editProdPretField = new JTextField();
-                            editProdPretField.setText(produs.get(8));
+                            editProdPretField.setText(stock.getPrice() + "");
                             save = new JButton("Save");
                             exit = new JButton("Exit");
                             delete = new JButton("Delete");
@@ -1290,9 +1438,20 @@ public class Grafica {
                                     JFrame dialog = new JFrame();
                                     int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa modificati produsul?", "Warning", JOptionPane.YES_NO_OPTION);
                                     if (a == JOptionPane.YES_OPTION) {
-                                        bazaDate.modifyFilm(editIDField.getText(), util.getOras(), editProdTitluField.getText(), editProdActorField.getText(), editProdDirectorField.getText(),
-                                                editProdDurataField.getText(), editProdGenField.getText(), editProdAnField.getText(), editProdAudientaField.getText(), editProdCantField.getText(),
-                                                editProdPretField.getText());
+                                        Movie movie = stock.getMovie();
+                                        movie.setIdMovie(Integer.parseInt(editIDField.getText()));
+                                        movie.setTitle(editProdTitluField.getText());
+                                        movie.setMainActor(editProdActorField.getText());
+                                        movie.setDirector(editProdDirectorField.getText());
+                                        movie.setDuration(Integer.parseInt(editProdDurataField.getText()));
+                                        movie.setGenre(editProdGenField.getText());
+                                        movie.setYear(editProdAnField.getText());
+                                        movie.setAudience(Integer.parseInt(editProdAudientaField.getText()));
+                                        stock.setPrice(Integer.parseInt(editProdPretField.getText()));
+                                        stock.setQuantity(Integer.parseInt(editProdCantField.getText()));
+
+                                        movieMan.updateMovie(movie);
+                                        stockMan.updateMovieStock(movie, stock.getStore(), stock.getQuantity(), stock.getPrice());
                                     }
                                 }
                             });
@@ -1303,7 +1462,7 @@ public class Grafica {
                                     JFrame dialog = new JFrame();
                                     int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa stergeti produsul?", "Warning", JOptionPane.YES_NO_OPTION);
                                     if (a == JOptionPane.YES_OPTION) {
-                                        bazaDate.deleteFilm(editIDField.getText(), util.getOras());
+                                        stockMan.deleteMovieStock(stock.getMovie(), stock.getStore());
                                         secondWindow.setVisible(false);
                                         secondWindow.dispose();
                                     }
@@ -1324,38 +1483,45 @@ public class Grafica {
                         JTextField editProdTitluField, editProdPlatformaField, editProdDeveloperField, editProdPublisherField, editProdGenField, editProdAnField, editProdAudientaField,
                                 editProdCantField, editProdPretField;
 
-                        ArrayList<String> produs = bazaDate.getProduct(editIDField.getText(), String.valueOf(editCategorieBox.getSelectedItem()), util.getOras());
-                        if (produs.isEmpty()) {
+                        Game game = new Game();
+                        game.setIdGame(Integer.parseInt(editIDField.getText()));
+                        Store store = new Store();
+                        store.setId(employee.getIdMag());
+                        Stock stock = stockMan.getGameStock(game, store);
+                        stock.setGame(gameMan.getGameById(game.getIdGame()));
+
+                        game = stock.getGame();
+                        if (stock == null) {
                             JFrame dialog = new JFrame();
                             JOptionPane.showMessageDialog(dialog, "ID-ul introdus nu exista in baza de date", "Warning", JOptionPane.WARNING_MESSAGE);
                         } else {
                             editProdTitluLabel = new JLabel("Titlu:");
                             editProdTitluField = new JTextField();
-                            editProdTitluField.setText(produs.get(0));
+                            editProdTitluField.setText(game.getTitle());
                             editProdPlatformaLabel = new JLabel("Platforma:");
                             editProdPlatformaField = new JTextField();
-                            editProdPlatformaField.setText(produs.get(1));
+                            editProdPlatformaField.setText(game.getPlatform());
                             editProdDeveloperLabel = new JLabel("Developer:");
                             editProdDeveloperField = new JTextField();
-                            editProdDeveloperField.setText(produs.get(2));
+                            editProdDeveloperField.setText(game.getDeveloper());
                             editProdPublisherLabel = new JLabel("Publisher:");
                             editProdPublisherField = new JTextField();
-                            editProdPublisherField.setText(produs.get(3));
+                            editProdPublisherField.setText(game.getPublisher());
                             editProdGenLabel = new JLabel("Gen:");
                             editProdGenField = new JTextField();
-                            editProdGenField.setText(produs.get(4));
+                            editProdGenField.setText(game.getGenre());
                             editProdAnLabel = new JLabel("An:");
                             editProdAnField = new JTextField();
-                            editProdAnField.setText(produs.get(5));
+                            editProdAnField.setText(game.getYear());
                             editProdAudientaLabel = new JLabel("Audienta:");
                             editProdAudientaField = new JTextField();
-                            editProdAudientaField.setText(produs.get(6));
+                            editProdAudientaField.setText(game.getAudience() + "");
                             editProdCantLabel = new JLabel("Cantitate:");
                             editProdCantField = new JTextField();
-                            editProdCantField.setText(produs.get(7));
+                            editProdCantField.setText(stock.getQuantity() + "");
                             editProdPretLabel = new JLabel("Pret:");
                             editProdPretField = new JTextField();
-                            editProdPretField.setText(produs.get(8));
+                            editProdPretField.setText(stock.getPrice() + "");
                             save = new JButton("Save");
                             exit = new JButton("Exit");
                             delete = new JButton("Delete");
@@ -1398,9 +1564,20 @@ public class Grafica {
                                     JFrame dialog = new JFrame();
                                     int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa modificati produsul?", "Warning", JOptionPane.YES_NO_OPTION);
                                     if (a == JOptionPane.YES_OPTION) {
-                                        bazaDate.modifyJoc(editIDField.getText(), util.getOras(), editProdTitluField.getText(), editProdPlatformaField.getText(), editProdDeveloperField.getText(),
-                                                editProdPublisherField.getText(), editProdAnField.getText(), editProdGenField.getText(), editProdAudientaField.getText(), editProdCantField.getText(),
-                                                editProdPretField.getText());
+                                        Game game = stock.getGame();
+                                        game.setIdGame(Integer.parseInt(editIDField.getText()));
+                                        game.setTitle(editProdTitluField.getText());
+                                        game.setPlatform(editProdPlatformaField.getText());
+                                        game.setDeveloper(editProdDeveloperField.getText());
+                                        game.setPublisher(editProdPublisherField.getText());
+                                        game.setYear(editProdAnField.getText());
+                                        game.setGenre(editProdGenField.getText());
+                                        game.setAudience(Integer.parseInt(editProdAudientaField.getText()));
+                                        stock.setQuantity(Integer.parseInt(editProdCantField.getText()));
+                                        stock.setPrice(Integer.parseInt(editProdPretField.getText()));
+
+                                        gameMan.updateGame(game);
+                                        stockMan.updateGameStock(game, stock.getStore(), stock.getQuantity(), stock.getPrice());
                                     }
                                 }
                             });
@@ -1411,7 +1588,7 @@ public class Grafica {
                                     JFrame dialog = new JFrame();
                                     int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa stergeti produsul?", "Warning", JOptionPane.YES_NO_OPTION);
                                     if (a == JOptionPane.YES_OPTION) {
-                                        bazaDate.deleteJoc(editIDField.getText(), util.getOras());
+                                        stockMan.deleteGameStock(stock.getGame(), stock.getStore());
                                         secondWindow.setVisible(false);
                                         secondWindow.dispose();
                                     }
@@ -1432,35 +1609,42 @@ public class Grafica {
                         JTextField editProdTitluField, editProdTrupaField, editProdMelodiiField, editProdCasaDiscField, editProdGenField, editProdAnField,
                                 editProdCantField, editProdPretField;
 
-                        ArrayList<String> produs = bazaDate.getProduct(editIDField.getText(), String.valueOf(editCategorieBox.getSelectedItem()), util.getOras());
-                        if (produs.isEmpty()) {
+                        Album album = new Album();
+                        album.setIdAlbum(Integer.parseInt(editIDField.getText()));
+                        Store store = new Store();
+                        store.setId(employee.getIdMag());
+                        Stock stock = stockMan.getAlbumStock(album, store);
+                        stock.setAlbum(albumMan.getAlbumById(album.getIdAlbum()));
+
+                        album = stock.getAlbum();
+                        if (stock == null) {
                             JFrame dialog = new JFrame();
                             JOptionPane.showMessageDialog(dialog, "ID-ul introdus nu exista in baza de date", "Warning", JOptionPane.WARNING_MESSAGE);
                         } else {
                             editProdTitluLabel = new JLabel("Titlu:");
                             editProdTitluField = new JTextField();
-                            editProdTitluField.setText(produs.get(0));
+                            editProdTitluField.setText(album.getTitle());
                             editProdTrupaLabel = new JLabel("Trupa:");
                             editProdTrupaField = new JTextField();
-                            editProdTrupaField.setText(produs.get(1));
+                            editProdTrupaField.setText(album.getArtist());
                             editProdMelodiiLabel = new JLabel("Numar melodii:");
                             editProdMelodiiField = new JTextField();
-                            editProdMelodiiField.setText(produs.get(2));
+                            editProdMelodiiField.setText(album.getNrMel() + "");
                             editProdCasaDiscLabel = new JLabel("Casa discuri:");
                             editProdCasaDiscField = new JTextField();
-                            editProdCasaDiscField.setText(produs.get(3));
+                            editProdCasaDiscField.setText(album.getProducer());
                             editProdGenLabel = new JLabel("Gen:");
                             editProdGenField = new JTextField();
-                            editProdGenField.setText(produs.get(4));
+                            editProdGenField.setText(album.getGenre());
                             editProdAnLabel = new JLabel("An:");
                             editProdAnField = new JTextField();
-                            editProdAnField.setText(produs.get(5));
+                            editProdAnField.setText(album.getYear());
                             editProdCantLabel = new JLabel("Cantitate:");
                             editProdCantField = new JTextField();
-                            editProdCantField.setText(produs.get(6));
+                            editProdCantField.setText(stock.getQuantity() + "");
                             editProdPretLabel = new JLabel("Pret:");
                             editProdPretField = new JTextField();
-                            editProdPretField.setText(produs.get(7));
+                            editProdPretField.setText(stock.getPrice() + "");
                             save = new JButton("Save");
                             exit = new JButton("Exit");
                             delete = new JButton("Delete");
@@ -1501,9 +1685,19 @@ public class Grafica {
                                     JFrame dialog = new JFrame();
                                     int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa modificati produsul?", "Warning", JOptionPane.YES_NO_OPTION);
                                     if (a == JOptionPane.YES_OPTION) {
-                                        bazaDate.modifyAlbum(editIDField.getText(), util.getOras(), editProdTitluField.getText(), editProdTrupaField.getText(), editProdMelodiiField.getText(),
-                                                editProdCasaDiscField.getText(), editProdAnField.getText(), editProdGenField.getText(), editProdCantField.getText(),
-                                                editProdPretField.getText());
+                                        Album album = stock.getAlbum();
+                                        album.setIdAlbum(Integer.parseInt(editIDField.getText()));
+                                        album.setTitle(editProdTitluField.getText());
+                                        album.setArtist(editProdTrupaField.getText());
+                                        album.setNrMel(Integer.parseInt(editProdMelodiiField.getText()));
+                                        album.setProducer(editProdCasaDiscField.getText());
+                                        album.setYear(editProdAnField.getText());
+                                        album.setGenre(editProdGenField.getText());
+                                        stock.setQuantity(Integer.parseInt(editProdCantField.getText()));
+                                        stock.setPrice(Integer.parseInt(editProdPretField.getText()));
+
+                                        albumMan.updateAlbum(album);
+                                        stockMan.updateAlbumStock(album, stock.getStore(), stock.getQuantity(), stock.getPrice());
                                     }
                                 }
                             });
@@ -1514,7 +1708,7 @@ public class Grafica {
                                     JFrame dialog = new JFrame();
                                     int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa stergeti produsul?", "Warning", JOptionPane.YES_NO_OPTION);
                                     if (a == JOptionPane.YES_OPTION) {
-                                        bazaDate.deleteAlbum(editIDField.getText(), util.getOras());
+                                        stockMan.deleteAlbumStock(stock.getAlbum(), stock.getStore());
                                         secondWindow.setVisible(false);
                                         secondWindow.dispose();
                                     }
@@ -1680,12 +1874,16 @@ public class Grafica {
                             || cnp.equals("") || phone.equals("") || year.equals("") || month.equals("") || day.equals("")) {
                         JFrame warningDialog = new JFrame();
                         JOptionPane.showMessageDialog(warningDialog, "You must complete all fields!", "Warning", JOptionPane.WARNING_MESSAGE);
-                    }
-                    else {
+                    } else {
                         String birthdate = new String(year + "-" + month + "-" + day);
 
-                        bazaDate.createClient(new Utilizator(firstName, lastName, address, city, birthdate, cnp, phone, email, 5));
-                        bazaDate.createAccount(new Utilizator(firstName, lastName, address, city, birthdate, cnp, phone, email, 5), username, password, true);
+                        Client client = new Client(0, lastName, firstName, address, city, LocalDate.parse(birthdate), cnp, phone, (email.isEmpty()) ? null : email, 5);
+                        Account account = new Account(0, username, password, null, 1, client.getId());
+                        AccountManager accountMan = new AccountManager();
+                        ClientManager clientMan = new ClientManager();
+
+                        clientMan.createClient(client);
+                        accountMan.createClientAccount(account);
 
                         JFrame confirmDialog = new JFrame();
                         JOptionPane.showMessageDialog(confirmDialog, "Your account has successfully been created!");
@@ -1695,7 +1893,8 @@ public class Grafica {
         }
 
         private void editCustomerWindow() {
-            ArrayList<String[]> customers = bazaDate.getCustomers();
+            ClientManager clientMan = new ClientManager();
+            ArrayList<Client> customers = clientMan.getAllClients();
             JTable table = new JTable();
             DefaultTableModel tableModel;
 
@@ -1705,11 +1904,12 @@ public class Grafica {
                 }
             };
 
-            String[] columns = new String[] {"ID", "Nume", "Prenume", "Adresa", "Oras", "Data nasterii", "CNP", "Telefon", "Email", "Loialitate", "Username", "Password"};
+            String[] columns = new String[]{"ID", "Nume", "Prenume", "Adresa", "Oras", "Data nasterii", "CNP", "Telefon", "Email", "Loialitate", "Username", "Password"};
             tableModel.setColumnIdentifiers(columns);
 
             for(int i = 0; i < customers.size(); i++) {
-                tableModel.addRow(customers.get(i));
+                Client client = customers.get(i);
+                tableModel.addRow(clientMan.clientToRow(client));
             }
 
             table.setModel(tableModel);
@@ -1820,9 +2020,24 @@ public class Grafica {
                                 JFrame f = new JFrame();
                                 int a = JOptionPane.showConfirmDialog(f, "Are you sure?", "Saving", JOptionPane.YES_NO_OPTION);
                                 if(a == JOptionPane.YES_OPTION) {
-                                    bazaDate.modifyClient(String.valueOf(table.getValueAt(table.getSelectedRow(), 0)), custNumeField.getText(), custPrenumeField.getText(),
-                                            custAdresaField.getText(), custOrasField.getText(), custDatNasField.getText(), custCNPField.getText(), custTelField.getText(),
-                                            String.valueOf(custEmailField.getText()), custUserField.getText(), custPassField.getText());
+                                    AccountManager accMan = new AccountManager();
+
+                                    Client client = new Client();
+                                    client.setId(Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 0))));
+                                    client.setNume(custNumeField.getText());
+                                    client.setPrenume(custPrenumeField.getText());
+                                    client.setAdresa(custAdresaField.getText());
+                                    client.setOras(custOrasField.getText());
+                                    client.setDatan(LocalDate.parse(custDatNasField.getText()));
+                                    client.setCnp(custCNPField.getText());
+                                    client.setTel(custTelField.getText());
+                                    client.setEmail((custEmailField.getText().isEmpty()) ? null : custEmailField.getText());
+                                    client.setAccount(accMan.getClientAccount(client));
+                                    client.getAccount().setUsername(custUserField.getText());
+                                    client.getAccount().setPassword(custPassField.getText());
+
+                                    accMan.updateClientAccount(client.getAccount());
+                                    clientMan.updateClient(client);
                                 }
                             }
                         });
@@ -1903,7 +2118,15 @@ public class Grafica {
 
             //Magazin
             JLabel newMagLabel = new JLabel("Magazin:");
-            JComboBox newMagBox = new JComboBox(bazaDate.getOrase().toArray());
+            StoreManager storeMan = new StoreManager();
+            ArrayList<Store> stores = storeMan.getStores();
+            ArrayList<String> cities = new ArrayList<>();
+            Iterator iter = stores.iterator();
+            while (iter.hasNext()) {
+                Store store = (Store) iter.next();
+                cities.add(store.getOras());
+            }
+            JComboBox newMagBox = new JComboBox(cities.toArray());
 
             //Birthday
             JLabel newBirthYearLabel = new JLabel("An(yyyy)");
@@ -2006,17 +2229,23 @@ public class Grafica {
                             || cnp.equals("") || phone.equals("") || year.equals("") || month.equals("") || day.equals("") || functie.equals("") || salariu.equals("")) {
                         JFrame warningDialog = new JFrame();
                         JOptionPane.showMessageDialog(warningDialog, "Trebuie completate toate campurile!", "Warning", JOptionPane.WARNING_MESSAGE);
-                    }
-                    else {
+                    } else {
                         String birthdate = new String(year + "-" + month + "-" + day);
 
-                        bazaDate.createEmployee(new Utilizator(firstName, lastName, address, city, birthdate, cnp, phone, email, functie, salariu, mag));
-                        bazaDate.createAccount(new Utilizator(firstName, lastName, address, city, birthdate, cnp, phone, email, functie, salariu, mag), username, password, false);
+                        EmployeeManager empMan = new EmployeeManager();
+                        AccountManager accMan = new AccountManager();
+                        StoreManager storeMan = new StoreManager();
+                        Store store = storeMan.getStoreByCity(mag);
+
+                        Employee emp = new Employee(0, lastName, firstName, address, city, LocalDate.parse(birthdate), cnp, phone, email, functie, Integer.parseInt(salariu), true, store.getId());
+                        empMan.createEmployee(emp);
+                        Account acc = new Account(0, username, password, null, 2, emp.getIdEmp());
+                        accMan.createEmployeeAccount(acc);
 
                         JFrame confirmDialog = new JFrame();
                         JOptionPane.showMessageDialog(confirmDialog, "Your account has successfully been created!");
 
-                        changePanel(mainMainPanel,size[0], size[1]);
+                        changePanel(mainMainPanel, size[0], size[1]);
                         MenuBar();
                         setTitle("DVDMania");
                     }
@@ -2025,7 +2254,8 @@ public class Grafica {
         }
 
         private void editEmployeeWindow() {
-            ArrayList<String[]> employees = bazaDate.getEmployees();
+            EmployeeManager empMan = new EmployeeManager();
+            ArrayList<Employee> employees = empMan.getEmployees();
             JTable table = new JTable();
             DefaultTableModel tableModel;
 
@@ -2035,11 +2265,12 @@ public class Grafica {
                 }
             };
 
-            String[] columns = new String[] {"ID", "Nume", "Prenume", "Adresa", "Oras", "Data nasterii", "CNP", "Telefon", "Email", "Functie", "Salariu", "Adresa magazin", "Username", "Parola"};
+            String[] columns = new String[]{"ID", "Nume", "Prenume", "Adresa", "Oras", "Data nasterii", "CNP", "Telefon", "Email", "Functie", "Salariu", "Adresa magazin", "Username", "Parola"};
             tableModel.setColumnIdentifiers(columns);
 
             for(int i = 0; i < employees.size(); i++) {
-                tableModel.addRow(employees.get(i));
+                Employee emp = employees.get(i);
+                tableModel.addRow(empMan.employeeToRow(emp));
             }
 
             table.setModel(tableModel);
@@ -2171,10 +2402,27 @@ public class Grafica {
                                 JFrame f = new JFrame();
                                 int a = JOptionPane.showConfirmDialog(f, "Are you sure?", "Saving", JOptionPane.YES_NO_OPTION);
                                 if(a == JOptionPane.YES_OPTION) {
-                                    bazaDate.modifyAngajat(String.valueOf(table.getValueAt(table.getSelectedRow(), 0)), empNumeField.getText(), empPrenumeField.getText(),
-                                            empAdresaField.getText(), empOrasField.getText(), empDatNasField.getText(), empCNPField.getText(), empTelField.getText(),
-                                            String.valueOf(empEmailField.getText()), empFuncField.getText(), empSalField.getText(), empStoreField.getText(), empActivField.getText(),
-                                            empUserField.getText(), empPassField.getText());
+                                    Employee emp = new Employee();
+                                    emp.setIdEmp(Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 0))));
+                                    emp.setNume(empNumeField.getText());
+                                    emp.setPrenume(empPrenumeField.getText());
+                                    emp.setAdresa(empAdresaField.getText());
+                                    emp.setOras(empOrasField.getText());
+                                    emp.setDatan(LocalDate.parse(empDatNasField.getText()));
+                                    emp.setCnp(empCNPField.getText());
+                                    emp.setTelefon(empTelField.getText());
+                                    emp.setEmail(empEmailField.getText());
+                                    emp.setFunctie(empFuncField.getText());
+                                    emp.setSalariu(Integer.parseInt(empSalField.getText()));
+
+                                    StoreManager storeMan = new StoreManager();
+                                    Store store = storeMan.getStoreByCity(empStoreField.getText());
+
+                                    emp.setActiv((empActivField.getText().equals("Activ")) ? true : false);
+                                    empMan.updateEmployee(emp);
+                                    Account account = new Account(0, empUserField.getText(), empPassField.getText(), null, 0, emp.getIdEmp());
+                                    AccountManager accMan = new AccountManager();
+                                    accMan.updateEmployeeAccount(account);
                                 }
                             }
                         });
@@ -2249,7 +2497,9 @@ public class Grafica {
                         JFrame f = new JFrame();
                         int a = JOptionPane.showConfirmDialog(f, "Are you sure?", "Exiting", JOptionPane.YES_NO_OPTION);
                         if(a == JOptionPane.YES_OPTION) {
-                            bazaDate.createStore(adresa, oras, tel);
+                            Store store = new Store(0, adresa, oras, tel);
+                            StoreManager storeMan = new StoreManager();
+                            storeMan.createStore(store);
                         }
                     }
                 }
@@ -2265,7 +2515,8 @@ public class Grafica {
         }
 
         private void editStoreWindow() {
-            ArrayList<String[]> stores = bazaDate.getStores();
+            StoreManager storeMan = new StoreManager();
+            ArrayList<Store> stores = storeMan.getStores();
             JTable table = new JTable();
             DefaultTableModel tableModel;
 
@@ -2275,11 +2526,12 @@ public class Grafica {
                 }
             };
 
-            String[] columns = new String[] {"ID", "Adresa", "Oras", "Telefon"};
+            String[] columns = new String[]{"ID", "Adresa", "Oras", "Telefon"};
             tableModel.setColumnIdentifiers(columns);
 
             for(int i = 0; i < stores.size(); i++) {
-                tableModel.addRow(stores.get(i));
+                Store store = stores.get(i);
+                tableModel.addRow(storeMan.storeToRow(store));
             }
 
             table.setModel(tableModel);
@@ -2354,7 +2606,13 @@ public class Grafica {
                                 JFrame f = new JFrame();
                                 int a = JOptionPane.showConfirmDialog(f, "Are you sure?", "Saving", JOptionPane.YES_NO_OPTION);
                                 if(a == JOptionPane.YES_OPTION) {
-                                    bazaDate.modifyMagazin(String.valueOf(table.getValueAt(table.getSelectedRow(), 0)), magAdresaField.getText(), magOrasField.getText(), magTelField.getText());
+                                    Store store = new Store();
+                                    store.setId(Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 0))));
+                                    store.setAdresa(magAdresaField.getText());
+                                    store.setOras(magOrasField.getText());
+                                    store.setTelefon(magTelField.getText());
+
+                                    storeMan.updateStore(store);
                                 }
                             }
                         });
@@ -2380,7 +2638,8 @@ public class Grafica {
         }
 
         private void newOrderWindow() {
-            ArrayList<String[]> customers = bazaDate.getCustomers();
+            ClientManager clientMan = new ClientManager();
+            ArrayList<Client> customers = clientMan.getAllClients();
             JTable table = new JTable();
             DefaultTableModel tableModel;
 
@@ -2390,11 +2649,12 @@ public class Grafica {
                 }
             };
 
-            String[] columns = new String[] {"ID", "Nume", "Prenume", "Adresa", "Oras", "Data nasterii", "CNP", "Telefon", "Email"};
+            String[] columns = new String[]{"ID", "Nume", "Prenume", "Adresa", "Oras", "Data nasterii", "CNP", "Telefon", "Email"};
             tableModel.setColumnIdentifiers(columns);
 
             for(int i = 0; i < customers.size(); i++) {
-                tableModel.addRow(customers.get(i));
+                Client client = customers.get(i);
+                tableModel.addRow(clientMan.clientToRow(client));
             }
 
             table.setModel(tableModel);
@@ -2451,9 +2711,13 @@ public class Grafica {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Introduceti ID-ul produsului", "Warning", JOptionPane.WARNING_MESSAGE);
                             } else {
-                                String res = bazaDate.newOrder(idField.getText(), String.valueOf(table.getValueAt(table.getSelectedRow(), 0)), util.getCNP(), categorieBox.getSelectedItem().toString());
-                                JFrame dialog = new JFrame();
-                                JOptionPane.showMessageDialog(dialog, "Imprumutul a fost efectuat cu succes! \n Data scadenta este pe " + res);
+                                //TODO: write order registration
+//                                Order order = new Order();
+//
+//                                String res = bazaDate.newOrder(idField.getText(), String.valueOf(table.getValueAt(table.getSelectedRow(), 0)),
+//                                        util.getCNP(), categorieBox.getSelectedItem().toString());
+//                                JFrame dialog = new JFrame();
+//                                JOptionPane.showMessageDialog(dialog, "Imprumutul a fost efectuat cu succes! \n Data scadenta este pe " + res);
                             }
                         }
                     });
@@ -2480,7 +2744,10 @@ public class Grafica {
         }
 
         private void finishOrderWindow() {
-            ArrayList<String[]> orders = bazaDate.getActiveOrders(util.getOras());
+            OrderManager orderMan = new OrderManager();
+            StoreManager storeMan = new StoreManager();
+            Store store = storeMan.getStoreByCity(employee.getOras());
+            ArrayList<Order> orders = orderMan.getStoreActiveOrders(store);
             JTable table = new JTable();
             DefaultTableModel tableModel;
 
@@ -2490,11 +2757,12 @@ public class Grafica {
                 }
             };
 
-            String[] columns = new String[] {"Nume", "Prenume", "CNP", "ID produs", "Data imprumutului"};
+            String[] columns = new String[]{"Nume", "Prenume", "CNP", "ID produs", "Data imprumutului"};
             tableModel.setColumnIdentifiers(columns);
 
             for(int i = 0; i < orders.size(); i++) {
-                tableModel.addRow(orders.get(i));
+                Order order = orders.get(i);
+                tableModel.addRow(orderMan.orderToRow(order));
             }
 
             table.setModel(tableModel);
@@ -2524,14 +2792,28 @@ public class Grafica {
                         JFrame warningDialog = new JFrame();
                         JOptionPane.showMessageDialog(warningDialog, "Alegeti mai intai o comanda din lista!", "Eroare", JOptionPane.WARNING_MESSAGE);
                     } else {
-                        int rez = bazaDate.returnOrder(String.valueOf(table.getValueAt(table.getSelectedRow(), 3)), String.valueOf(table.getValueAt(table.getSelectedRow(), 2)),
-                                String.valueOf(table.getValueAt(table.getSelectedRow(), 4)));
-                        if(rez <= 7) {
-                            bazaDate.rewardClient(String.valueOf(table.getValueAt(table.getSelectedRow(), 2)), true);
+                        Iterator iter = orders.iterator();
+                        Order order = null;
+                        while (iter.hasNext()) {
+                            Order ord = (Order) iter.next();
+                            int idProd = ord.getStock().getIdProduct();
+                            String cnp = ord.getClient().getCnp();
+                            LocalDate dataImp = ord.getBorrowDate();
+                            if (idProd == Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 3))) &&
+                                    cnp.equals(String.valueOf(table.getValueAt(table.getSelectedRow(), 2))) &&
+                                    dataImp.equals(LocalDate.parse(String.valueOf(table.getValueAt(table.getSelectedRow(), 4))))) {
+                                order = ord;
+                            }
+                        }
+                        int rez = orderMan.checkInOrder(order.getStock(), order.getClient(), order.getBorrowDate());
+                        if (rez <= 7) {
+                            ClientManager clientMan = new ClientManager();
+                            clientMan.rewardClient(order.getClient());
                             JFrame dialog = new JFrame();
                             JOptionPane.showMessageDialog(dialog, "Clientul a adus produsul la timp!");
                         } else {
-                            bazaDate.rewardClient(String.valueOf(table.getValueAt(table.getSelectedRow(), 2)), false);
+                            ClientManager clientMan = new ClientManager();
+                            clientMan.punishClient(order.getClient());
                             JFrame dialog = new JFrame();
                             JOptionPane.showMessageDialog(dialog, "Atentie! Clientul nu a adus produsul la timp!", "Warning", JOptionPane.WARNING_MESSAGE);
                         }
@@ -2549,14 +2831,16 @@ public class Grafica {
         }
 
         private void viewAllOrdersWindow() {
-            ArrayList<String[]> orders = new ArrayList<>();
-            String[] columns = new String[] {};
-            if(priv == 1) {
-                orders = bazaDate.getAllOrdersClient(util.getCNP());
-                columns = new String[] {"Nume", "Prenume", "ID produs", "Data imprumutului", "Data returnarii", "Pret"};
+            OrderManager orderMan = new OrderManager();
+            ArrayList<Order> orders = new ArrayList<>();
+            String[] columns = new String[]{};
+            if (priv == 1) {
+                orders = orderMan.getAllClientOrders(client);
+                columns = new String[]{"Nume", "Prenume", "ID produs", "Data imprumutului", "Data returnarii", "Pret"};
             } else if (priv == 2 || priv == 3) {
-                orders = bazaDate.getAllOrders(util.getOras());
-                columns = new String[] {"Nume", "Prenume", "CNP", "ID produs", "Data imprumutului", "Data returnarii", "Pret"};
+                StoreManager storeMan = new StoreManager();
+                orders = orderMan.getAllStoreOrders(storeMan.getStoreById(employee.getIdMag()));
+                columns = new String[]{"Nume", "Prenume", "CNP", "ID produs", "Data imprumutului", "Data returnarii", "Pret"};
             }
             JTable table = new JTable();
             DefaultTableModel tableModel;
@@ -2570,7 +2854,27 @@ public class Grafica {
             tableModel.setColumnIdentifiers(columns);
 
             for(int i = 0; i < orders.size(); i++) {
-                tableModel.addRow(orders.get(i));
+                Order order = orders.get(i);
+                if (priv == 1) {
+                    String[] row = new String[6];
+                    row[0] = order.getClient().getNume();
+                    row[1] = order.getClient().getPrenume();
+                    row[2] = order.getStock().getIdProduct() + "";
+                    row[3] = order.getBorrowDate().toString();
+                    row[4] = (order.getReturnDate() == null) ? "Imprumutat" : order.getReturnDate().toString();
+                    row[5] = order.getPrice() + "";
+                    tableModel.addRow(row);
+                } else {
+                    String[] row = new String[7];
+                    row[0] = order.getClient().getNume();
+                    row[1] = order.getClient().getPrenume();
+                    row[2] = order.getClient().getCnp();
+                    row[3] = order.getStock().getIdProduct() + "";
+                    row[4] = order.getBorrowDate().toString();
+                    row[5] = (order.getReturnDate() == null) ? "Imprumutat" : order.getReturnDate().toString();
+                    row[6] = order.getPrice() + "";
+                    tableModel.addRow(row);
+                }
             }
 
             table.setModel(tableModel);
@@ -2604,19 +2908,19 @@ public class Grafica {
                 JLabel nume, prenume, adresa, oras, datan, cnp, tel, email, loialitate;
                 JButton exit;
 
-                nume = new JLabel("Nume: " + util.getNume());
-                prenume = new JLabel("Prenume: " + util.getPrenume());
-                adresa = new JLabel("Adresa: " + util.getAdresa());
-                oras = new JLabel("Oras: " + util.getOras());
-                datan = new JLabel("Data nasterii: " + util.getDataNasterii());
-                cnp = new JLabel("CNP: " + util.getCNP());
-                tel = new JLabel("Telefon: " + util.getTelefon());
-                email = new JLabel("Email: " + util.getEmail());
-                loialitate = new JLabel("Loialitate: " + util.getLoialitate());
+                nume = new JLabel("Nume: " + client.getNume());
+                prenume = new JLabel("Prenume: " + client.getPrenume());
+                adresa = new JLabel("Adresa: " + client.getAdresa());
+                oras = new JLabel("Oras: " + client.getOras());
+                datan = new JLabel("Data nasterii: " + client.getDatan());
+                cnp = new JLabel("CNP: " + client.getCnp());
+                tel = new JLabel("Telefon: " + client.getTel());
+                email = new JLabel("Email: " + client.getEmail());
+                loialitate = new JLabel("Loialitate: " + client.getLoialitate());
                 exit = new JButton("Exit");
 
                 JPanel main, detail;
-                detail = new JPanel(new GridLayout(9,1,5,5));
+                detail = new JPanel(new GridLayout(9, 1, 5, 5));
                 detail.add(nume);
                 detail.add(prenume);
                 detail.add(adresa);
@@ -2648,19 +2952,19 @@ public class Grafica {
                 JLabel nume, prenume, adresa, oras, datan, cnp, tel, email, functie;
                 JButton exit;
 
-                nume = new JLabel("Nume: " + util.getNume());
-                prenume = new JLabel("Prenume: " + util.getPrenume());
-                adresa = new JLabel("Adresa: " + util.getAdresa());
-                oras = new JLabel("Oras: " + util.getOras());
-                datan = new JLabel("Data nasterii: " + util.getDataNasterii());
-                cnp = new JLabel("CNP: " + util.getCNP());
-                tel = new JLabel("Telefon: " + util.getTelefon());
-                email = new JLabel("Email: " + bazaDate.getEmail(util.getCNP()));
-               functie = new JLabel("Functie: " + bazaDate.getFunctie(util.getCNP()));
+                nume = new JLabel("Nume: " + employee.getNume());
+                prenume = new JLabel("Prenume: " + employee.getPrenume());
+                adresa = new JLabel("Adresa: " + employee.getAdresa());
+                oras = new JLabel("Oras: " + employee.getOras());
+                datan = new JLabel("Data nasterii: " + employee.getDatan());
+                cnp = new JLabel("CNP: " + employee.getCnp());
+                tel = new JLabel("Telefon: " + employee.getTelefon());
+                email = new JLabel("Email: " + employee.getEmail());
+                functie = new JLabel("Functie: " + employee.getFunctie());
                 exit = new JButton("Exit");
 
                 JPanel main, detail;
-                detail = new JPanel(new GridLayout(9,1,5,5));
+                detail = new JPanel(new GridLayout(9, 1, 5, 5));
                 detail.add(nume);
                 detail.add(prenume);
                 detail.add(adresa);
@@ -2706,7 +3010,7 @@ public class Grafica {
         }
 
         //change contents of the main table based on the arraylist and string inputs
-        private JTable initializeTable(ArrayList<String[]> contents) {
+        private JTable initializeTable(ArrayList<Stock> contents) {
 
             mainTableModel = new DefaultTableModel() {
                 public boolean isCellEditable(int row, int column) {
@@ -2714,11 +3018,18 @@ public class Grafica {
                 }
             };
 
-            String[] columns = new String[] {"ID", "Titlu", "Actor principal", "Director", "Durata", "Gen", "An", "Audienta", "Pret"};
+            String[] columns = new String[]{"ID", "Titlu", "Actor principal", "Director", "Durata", "Gen", "An", "Audienta", "Pret"};
             mainTableModel.setColumnIdentifiers(columns);
 
-            for(int i = 0; i < contents.size(); i++) {
-                mainTableModel.addRow(contents.get(i));
+            StockManager stockMan = new StockManager();
+            MovieManager movieMan = new MovieManager();
+
+            for (int i = 0; i < contents.size(); i++) {
+                Stock stock = contents.get(i);
+                Movie movie = stock.getMovie();
+                int price = stock.getPrice();
+
+                mainTableModel.addRow(movieMan.movieToRow(movie, price));
             }
 
             JTable table = new JTable();
@@ -2726,7 +3037,7 @@ public class Grafica {
             return table;
         }
 
-        private DefaultTableModel updateList(String gen, ArrayList<String[]> contents, String cat) {
+        private DefaultTableModel updateList(String gen, ArrayList<Stock> contents, String cat) {
 
             DefaultTableModel model = new DefaultTableModel() {
                 public boolean isCellEditable(int row, int column) {
@@ -2736,49 +3047,72 @@ public class Grafica {
 
             String[] columns;
 
-            if(cat.equals("Filme")) {
-                columns = new String[] {"ID", "Titlu", "Actor principal", "Director", "Durata", "Gen", "An", "Audienta", "Pret"};
+            if (cat.equals("Filme")) {
+                columns = new String[]{"ID", "Titlu", "Actor principal", "Director", "Durata", "Gen", "An", "Audienta", "Pret"};
                 model.setColumnIdentifiers(columns);
 
-                for(int i = 0; i < contents.size(); i++) {
-                    String[] mid= contents.get(i);
-                    if(gen.equals("Toate")) {
-                        model.addRow(mid);
-                    } else if(mid[5].equals(gen)) {
-                        model.addRow(mid);
+                MovieManager movieMan = new MovieManager();
+
+                for (int i = 0; i < contents.size(); i++) {
+                    Stock stock = contents.get(i);
+                    Movie movie = stock.getMovie();
+                    int price = stock.getPrice();
+
+                    if (gen.equals("Toate")) {
+                        model.addRow(movieMan.movieToRow(movie, price));
+                    } else if (movie.getGenre().equals(gen)) {
+                        model.addRow(movieMan.movieToRow(movie, price));
                     }
                 }
             } else if(cat.equals("Jocuri")) {
-                columns = new String[] {"ID", "Titlu", "Platforma", "Developer", "Publisher", "Gen", "An", "Audienta", "Pret"};
+                columns = new String[]{"ID", "Titlu", "Platforma", "Developer", "Publisher", "Gen", "An", "Audienta", "Pret"};
                 model.setColumnIdentifiers(columns);
 
-                for(int i = 0; i < contents.size(); i++) {
-                    String[] mid= contents.get(i);
-                    if(gen.equals("Toate")) {
-                        model.addRow(mid);
-                    } else if(mid[5].equals(gen)) {
-                        model.addRow(mid);
+                GameManager gameMan = new GameManager();
+
+                for (int i = 0; i < contents.size(); i++) {
+                    Stock stock = contents.get(i);
+                    Game game = stock.getGame();
+                    int price = stock.getPrice();
+
+                    if (gen.equals("Toate")) {
+                        model.addRow(gameMan.gameToRow(game, price));
+                    } else if (game.getGenre().equals(gen)) {
+                        model.addRow(gameMan.gameToRow(game, price));
                     }
                 }
             } else if(cat.equals("Albume")) {
-                columns = new String[] {"ID", "Trupa", "Titlu", "Casa discuri", "Nr. Melodii", "Gen", "An", "Pret"};
+                columns = new String[]{"ID", "Trupa", "Titlu", "Casa discuri", "Nr. Melodii", "Gen", "An", "Pret"};
                 model.setColumnIdentifiers(columns);
 
-                for(int i = 0; i < contents.size(); i++) {
-                    String[] mid= contents.get(i);
-                    if(gen.equals("Toate")) {
-                        model.addRow(mid);
-                    } else if(mid[5].equals(gen)) {
-                        model.addRow(mid);
+                AlbumManager albumMan = new AlbumManager();
+
+                for (int i = 0; i < contents.size(); i++) {
+                    Stock stock = contents.get(i);
+                    Album album = stock.getAlbum();
+                    int price = stock.getPrice();
+
+                    if (gen.equals("Toate")) {
+                        model.addRow(albumMan.albumToRow(album, price));
+                    } else if (album.getGenre().equals(gen)) {
+                        model.addRow(albumMan.albumToRow(album, price));
                     }
                 }
             } else if(cat.equals("Melodii")) {
-                columns = new String[] {"ID", "Nume", "Durata"};
+                columns = new String[]{"ID", "Nume", "Durata"};
                 model.setColumnIdentifiers(columns);
 
-                for(int i = 0; i < contents.size(); i++) {
-                    String[] mid= contents.get(i);
-                    model.addRow(mid);
+                SongManager songMan = new SongManager();
+
+                for (int i = 0; i < contents.size(); i++) {
+                    Stock stock = contents.get(i);
+                    Album album = stock.getAlbum();
+                    ArrayList<Song> songs = album.getSongs();
+
+                    Iterator iterator = songs.iterator();
+                    while (iterator.hasNext()) {
+                        model.addRow(songMan.songToRow((Song) iterator.next()));
+                    }
                 }
             }
 
@@ -2787,26 +3121,38 @@ public class Grafica {
 
         private void updateComboBox(String gen) {
 
-            for(int i = 0; i < mainCategoriesList.size() ; i++) {
-                if(i == mainCategoriesList.size() - 1) {
+            for (int i = 0; i < mainCategoriesList.size(); i++) {
+                if (i == mainCategoriesList.size() - 1) {
                     mainCategoryModel.addElement("Toate");
                 }
                 mainCategoryModel.removeElement(mainCategoriesList.get(i));
             }
 
-            mainCategoriesList = bazaDate.getGen(gen);
+            switch (gen) {
+                case "Filme":
+                    MovieManager movieMan = new MovieManager();
+                    mainCategoriesList = movieMan.getGenres();
+                    break;
+                case "Jocuri":
+                    GameManager gameMan = new GameManager();
+                    mainCategoriesList = gameMan.getGenres();
+                    break;
+                case "Muzica":
+                    AlbumManager albumManager = new AlbumManager();
+                    mainCategoriesList = albumManager.getGenres();
+            }
 
-            for(int i = 1; i < mainCategoriesList.size() ; i++) {
+            for (int i = 1; i < mainCategoriesList.size(); i++) {
                 mainCategoryModel.addElement(mainCategoriesList.get(i));
             }
         }
 
-        private String[] storeListToBox(ArrayList<String[]> string) {
+        private String[] storeListToBox(ArrayList<Store> string) {
             String[] result = new String[string.size() + 1];
             result[0] = "Toate";
 
-            for(int i = 0; i < string.size(); i++) {
-                result[i + 1] = string.get(i)[2];
+            for (int i = 0; i < string.size(); i++) {
+                result[i + 1] = string.get(i).getOras();
             }
 
             return result;

@@ -10,6 +10,10 @@ public class Movie {
     private String year;
     private int audience;
 
+    public Movie() {
+
+    }
+
     public Movie(int idMovie, String title, String mainActor, String director, int duration, String genre, String year, int audience) {
         this.idMovie = idMovie;
         this.title = title;

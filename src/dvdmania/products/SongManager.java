@@ -12,7 +12,7 @@ public class SongManager {
 
     ConnectionManager connMan = new ConnectionManager();
 
-    public ArrayList<Song> getSongs(Album album) {
+    public ArrayList<Song> getSongs(int idAlbum) {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet result = null;
@@ -22,7 +22,7 @@ public class SongManager {
             connection = connMan.openConnection();
             String sql = "SELECT id_muzica, nume, durata FROM dvdmania.muzica WHERE id_album=?";
             connection.prepareStatement(sql);
-            statement.setInt(1, album.getIdAlbum());
+            statement.setInt(1, idAlbum);
             result = statement.executeQuery();
 
             while (result.next()) {
@@ -76,5 +76,14 @@ public class SongManager {
         }
 
         return rowsInserted;
+    }
+
+    public String[] songToRow(Song song) {
+        String[] row = new String[3];
+        row[0] = song.getIdSong() + "";
+        row[1] = song.getNume();
+        row[2] = song.getDuration() + "";
+
+        return row;
     }
 }

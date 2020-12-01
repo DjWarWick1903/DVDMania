@@ -32,9 +32,136 @@ public class AccountManager {
                 if (idClient != 0) {
                     account = new Account(id, username, password, date, 1, idClient);
                 } else if (idEmployee != 0) {
-                    account = new Account(id, username, password, date, 2, idClient);
+                    account = new Account(id, username, password, date, 2, idEmployee);
                 }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
 
+        return account;
+    }
+
+    public Account getClientAccount(Client client) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Account account = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_cont, util, parola, data_creat FROM conturi WHERE id_cl=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, client.getId());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int id = result.getInt(1);
+                String username = result.getString(2);
+                String password = result.getString(3);
+                LocalDate date = result.getDate(4).toLocalDate();
+
+                account = new Account(id, username, password, date, 1, client.getId());
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return account;
+    }
+
+    public boolean updateClientAccount(Account account) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        boolean isUpdated = false;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "UPDATE conturi(util, parola) VALUES(?,?) WHERE id_cl=?";
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, account.getUsername());
+            statement.setString(2, account.getPassword());
+            statement.setInt(3, account.getIdUtil());
+            int rowsUpdated = statement.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                isUpdated = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return isUpdated;
+    }
+
+    public boolean updateEmployeeAccount(Account account) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        boolean isUpdated = false;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "UPDATE conturi(util, parola) VALUES(?,?) WHERE id_ang=?";
+            statement = connection.prepareStatement(sql);
+            statement.setString(1, account.getUsername());
+            statement.setString(2, account.getPassword());
+            statement.setInt(3, account.getIdUtil());
+            int rowsUpdated = statement.executeUpdate();
+
+            if (rowsUpdated > 0) {
+                isUpdated = true;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return isUpdated;
+    }
+
+    public Account getEmployeeAccount(Employee employee) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Account account = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_cont, util, parola, data_creat FROM conturi WHERE id_ang=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, employee.getIdEmp());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int id = result.getInt(1);
+                String username = result.getString(2);
+                String password = result.getString(3);
+                LocalDate date = result.getDate(4).toLocalDate();
+
+                account = new Account(id, username, password, date, 1, employee.getIdEmp());
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -142,7 +269,7 @@ public class AccountManager {
                 statement = connection.prepareStatement(sql);
                 statement.setString(1, account.getUsername());
                 statement.setString(2, account.getPassword());
-                statement.executeQuery();
+                result = statement.executeQuery();
 
                 while (result.next()) {
                     isCorrect = true;
@@ -150,8 +277,50 @@ public class AccountManager {
             }
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
         }
 
         return isCorrect;
+    }
+
+    public int checkAccountPrivilege(Account account) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        int priv = 1;
+
+        try {
+            connection = connMan.openConnection();
+            if (account.getPriv() == 2) {
+                priv = 2;
+                String sql = "SELECT functie FROM angajati WHERE id_angaj=?";
+                statement = connection.prepareStatement(sql);
+                statement.setInt(1, account.getIdUtil());
+                result = statement.executeQuery();
+
+                while (result.next()) {
+                    String post = result.getString(1);
+                    if (post.equals("Director") || post.equals("Manager")) {
+                        priv = 3;
+                        account.setPriv(3);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return priv;
     }
 }

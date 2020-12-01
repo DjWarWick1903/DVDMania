@@ -3,6 +3,7 @@ package dvdmania.management;
 import dvdmania.tools.ConnectionManager;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 public class StoreManager {
@@ -18,7 +19,7 @@ public class StoreManager {
         try {
             connection = connMan.openConnection();
             String sql = "SELECT adresa, oras, tel FROM magazin WHERE id_mag=?";
-            connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sql);
             statement.setInt(1, id);
             result = statement.executeQuery();
 
@@ -137,15 +138,16 @@ public class StoreManager {
         return rowsUpdated;
     }
 
-    public LinkedList<Store> getStores() {
-        LinkedList<Store> stores = new LinkedList<>();
+    public ArrayList<Store> getStores() {
+        ArrayList<Store> stores = new ArrayList<>();
         Connection connection = null;
-        PreparedStatement statement = null;
+        Statement statement = null;
         ResultSet result = null;
 
         try {
             connection = connMan.openConnection();
             String sql = "SELECT id_mag, adresa, oras, tel FROM dvdmania.magazin";
+            statement = connection.createStatement();
             result = statement.executeQuery(sql);
 
             while (result.next()) {
@@ -196,5 +198,50 @@ public class StoreManager {
         }
 
         return cities;
+    }
+
+    public Store getStoreByEmployee(Employee employee) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        Store store = null;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT m.id_mag, m.adresa, m.oras, m.tel FROM magazin m JOIN angajati a USING(id_mag) WHERE id_ang=?";
+            connection.prepareStatement(sql);
+            statement.setInt(1, employee.getIdEmp());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int id = result.getInt(1);
+                String adress = result.getString(2);
+                String city = result.getString(3);
+                String tel = result.getString(4);
+
+                store = new Store(id, adress, city, tel);
+                employee.setIdMag(id);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return store;
+    }
+
+    public String[] storeToRow(Store store) {
+        String[] row = new String[4];
+        row[0] = store.getId() + "";
+        row[1] = store.getAdresa();
+        row[2] = store.getOras();
+        row[3] = store.getTelefon();
+
+        return row;
     }
 }

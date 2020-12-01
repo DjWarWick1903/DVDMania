@@ -1,5 +1,7 @@
 package dvdmania.products;
 
+import java.util.ArrayList;
+
 public class Album {
     int idAlbum;
     String artist;
@@ -8,6 +10,11 @@ public class Album {
     String genre;
     String producer;
     String year;
+    ArrayList<Song> songs = new ArrayList<>();
+
+    public Album() {
+
+    }
 
     public Album(int idAlbum, String artist, String title, int nrMel, String genre, String producer, String year) {
         this.idAlbum = idAlbum;
@@ -73,5 +80,13 @@ public class Album {
 
     public void setYear(String year) {
         this.year = year;
+    }
+
+    public ArrayList<Song> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(ArrayList<Song> songs) {
+        this.songs = songs;
     }
 }
