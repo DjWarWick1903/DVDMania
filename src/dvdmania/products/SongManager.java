@@ -21,7 +21,7 @@ public class SongManager {
         try {
             connection = connMan.openConnection();
             String sql = "SELECT id_muzica, nume, durata FROM dvdmania.muzica WHERE id_album=?";
-            connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sql);
             statement.setInt(1, idAlbum);
             result = statement.executeQuery();
 

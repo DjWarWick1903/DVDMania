@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class OrderManager {
 
-    ConnectionManager connMan = null;
+    ConnectionManager connMan = new ConnectionManager();
 
     public int checkAvailability(Stock stock, Store store) {
         Connection connection = null;
@@ -217,7 +217,7 @@ public class OrderManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "SELECT i.id_prod, i.id_cl, i.id_angaj, i.data_imp, i.pret FROM imprumuturi JOIN magazin m USING(id_mag) " +
+            String sql = "SELECT i.id_prod, i.id_cl, i.id_angaj, i.data_imp, i.pret FROM imprumuturi i JOIN magazin m USING(id_mag) " +
                     "WHERE i.data_ret IS NULL AND m.id_mag=?";
             statement = connection.prepareStatement(sql);
             statement.setInt(1, store.getId());
@@ -262,7 +262,7 @@ public class OrderManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "SELECT id_prod, id_cl, id_angaj, data_imp, pret FROM imprumuturi" +
+            String sql = "SELECT id_prod, id_cl, id_angaj, data_imp, data_ret, pret FROM imprumuturi " +
                     "WHERE id_mag=?";
             statement = connection.prepareStatement(sql);
             statement.setInt(1, store.getId());
@@ -277,13 +277,14 @@ public class OrderManager {
                 int idClient = result.getInt("id_cl");
                 int idEmp = result.getInt("id_angaj");
                 LocalDate date = result.getDate("data_imp").toLocalDate();
+                LocalDate retDate = (result.getDate("data_ret") == null) ? null : result.getDate("data_ret").toLocalDate();
                 int price = result.getInt("pret");
 
                 Stock stock = stockMan.getStockById(idStock);
                 Client client = clientMan.getClientById(idClient);
                 Employee emp = empMan.getEmployeeById(idEmp);
 
-                Order order = new Order(stock, client, emp, store, date, null, price);
+                Order order = new Order(stock, client, emp, store, date, retDate, price);
                 orderList.add(order);
             }
         } catch (SQLException e) {
@@ -307,7 +308,7 @@ public class OrderManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "SELECT id_mag, id_prod, id_angaj, data_imp, pret FROM imprumuturi " +
+            String sql = "SELECT id_mag, id_prod, id_angaj, data_imp, data_ret, pret FROM imprumuturi " +
                     "WHERE id_cl=?";
             statement = connection.prepareStatement(sql);
             statement.setInt(1, client.getId());
@@ -322,13 +323,14 @@ public class OrderManager {
                 int idStore = result.getInt("id_mag");
                 int idEmp = result.getInt("id_angaj");
                 LocalDate date = result.getDate("data_imp").toLocalDate();
+                LocalDate retDate = (result.getDate("data_ret") == null) ? null : result.getDate("data_ret").toLocalDate();
                 int price = result.getInt("pret");
 
                 Stock stock = stockMan.getStockById(idStock);
                 Store store = storeMan.getStoreById(idStore);
                 Employee emp = empMan.getEmployeeById(idEmp);
 
-                Order order = new Order(stock, client, emp, store, date, null, price);
+                Order order = new Order(stock, client, emp, store, date, retDate, price);
                 orderList.add(order);
             }
         } catch (SQLException e) {
@@ -342,6 +344,37 @@ public class OrderManager {
         }
 
         return orderList;
+    }
+
+    public int getActiveOrders(int idStock, int idStore) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        int orders = 0;
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT COUNT(*) FROM imprumuturi " +
+                    "WHERE data_ret IS NULL AND id_prod=? AND id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, idStock);
+            statement.setInt(2, idStore);
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                orders = result.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return orders;
     }
 
     public String[] orderToRow(Order order) {

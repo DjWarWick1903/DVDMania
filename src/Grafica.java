@@ -30,9 +30,6 @@ public class Grafica {
         // 3 - admin
         static int priv = 0;
 
-//        DataManip bazaDate = new DataManip();
-//        static Utilizator util;
-
         //Cache variabile
         static ImageIcon imagePathLog = new ImageIcon(new ImageIcon("logo.png").getImage().getScaledInstance(120, 130, Image.SCALE_DEFAULT));
         static JLabel imagine = new JLabel(imagePathLog);
@@ -419,8 +416,9 @@ public class Grafica {
                 public void actionPerformed(ActionEvent e) {
                     setVisible(false);
                     dispose();
-                    JFrame f = new JFrame();
-                    changePanel(logMainPanel,loginSize[0],loginSize[1]);
+                    changePanel(logMainPanel, loginSize[0], loginSize[1]);
+                    employee = null;
+                    client = null;
                     setJMenuBar(null);
                 }
             });
@@ -577,7 +575,7 @@ public class Grafica {
             //Button panel
             mainFilmeButton = new JButton("Filme");
             mainJocuriButton = new JButton("Jocuri");
-            mainAlbumeButton = new JButton("Muzica");
+            mainAlbumeButton = new JButton("Albume");
 
             MovieManager movieMan = new MovieManager();
             StoreManager storeMan = new StoreManager();
@@ -751,7 +749,7 @@ public class Grafica {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     categorieCurenta = "Albume";
-                    updateComboBox("Muzica");
+                    updateComboBox("Albume");
                     mainCategoryBox.setSelectedItem("Toate");
                     mainStoreBox.setSelectedItem("Toate");
                     StockManager stockMan = new StockManager();
@@ -772,37 +770,49 @@ public class Grafica {
                             int nrTot = 0;
                             StockManager stockMan = new StockManager();
                             StoreManager storeMan = new StoreManager();
-                            Store store;
+                            Store store = null;
                             switch (categorieCurenta) {
                                 case "Filme":
                                     MovieManager movieMan = new MovieManager();
 
                                     Movie movie = movieMan.getMovieById(id);
-                                    store = storeMan.getStoreByCity(client.getOras());
+                                    if (priv == 1) {
+                                        store = storeMan.getStoreByCity(client.getOras());
+                                    } else if (priv == 2 || priv == 3) {
+                                        store = storeMan.getStoreByCity(employee.getOras());
+                                    }
                                     nrTot = stockMan.checkMovieStock(movie, store);
                                     break;
                                 case "Jocuri":
                                     GameManager gameMan = new GameManager();
 
                                     Game game = gameMan.getGameById(id);
-                                    store = storeMan.getStoreByCity(client.getOras());
+                                    if (priv == 1) {
+                                        store = storeMan.getStoreByCity(client.getOras());
+                                    } else if (priv == 2 || priv == 3) {
+                                        store = storeMan.getStoreByCity(employee.getOras());
+                                    }
                                     nrTot = stockMan.checkGameStock(game, store);
                                     break;
                                 case "Albume":
                                     AlbumManager albumMan = new AlbumManager();
 
                                     Album album = albumMan.getAlbumById(id);
-                                    store = storeMan.getStoreByCity(client.getOras());
+                                    if (priv == 1) {
+                                        store = storeMan.getStoreByCity(client.getOras());
+                                    } else if (priv == 2 || priv == 3) {
+                                        store = storeMan.getStoreByCity(employee.getOras());
+                                    }
                                     nrTot = stockMan.checkAlbumStock(album, store);
                             }
 
                             if (nrTot > 0) {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Vesti bune! \n Mai sunt " + nrTot + " copii ale acestui produs in magazin!");
-                            } else if (nrTot == 0) {
+                            } else if (nrTot == -1) {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Ne pare rau, dar acest produs nu exista in magazinul orasului dumneavoastra!");
-                            } else {
+                            } else if (nrTot == 0) {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Ne pare rau, dar in acest moment nu mai exista nici o copie disponibila in magazin!");
                             }
@@ -1109,7 +1119,7 @@ public class Grafica {
                                 StockManager stockMan = new StockManager();
                                 StoreManager storeMan = new StoreManager();
 
-                                Game game = new Game(0, titlu, platforma, developer, publisher, gen, an, Integer.parseInt(audienta));
+                                Game game = new Game(0, titlu, an, platforma, developer, publisher, gen, Integer.parseInt(audienta));
                                 Store store = storeMan.getStoreByCity(employee.getOras());
 
                                 gameMan.createGame(game);
@@ -1245,7 +1255,7 @@ public class Grafica {
                         Album album = (Album) iterator.next();
                         numeAlbume.add(album.getTitle());
                     }
-                    newSongAlbumBox = new JComboBox(albume.toArray());
+                    newSongAlbumBox = new JComboBox(numeAlbume.toArray());
                     save = new JButton("Save");
                     exit = new JButton("Exit");
 
@@ -1302,6 +1312,14 @@ public class Grafica {
                             newSongWindow.dispose();
                         }
                     });
+                }
+            });
+
+            exit.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    newProdWindow.setVisible(false);
+                    newProdWindow.dispose();
                 }
             });
         }
@@ -1363,12 +1381,13 @@ public class Grafica {
                         Store store = new Store();
                         store.setId(employee.getIdMag());
                         Stock stock = stockMan.getMovieStock(movie, store);
-                        stock.setMovie(movieMan.getMovieById(movie.getIdMovie()));
-                        movie = stock.getMovie();
+
                         if (stock == null) {
                             JFrame dialog = new JFrame();
                             JOptionPane.showMessageDialog(dialog, "ID-ul introdus nu exista in baza de date", "Warning", JOptionPane.WARNING_MESSAGE);
                         } else {
+                            stock.setMovie(movieMan.getMovieById(movie.getIdMovie()));
+                            movie = stock.getMovie();
                             editProdTitluLabel = new JLabel("Titlu:");
                             editProdTitluField = new JTextField();
                             editProdTitluField.setText(movie.getTitle());
@@ -1882,11 +1901,22 @@ public class Grafica {
                         AccountManager accountMan = new AccountManager();
                         ClientManager clientMan = new ClientManager();
 
-                        clientMan.createClient(client);
-                        accountMan.createClientAccount(account);
+                        int clID = clientMan.createClient(client);
+                        account.setIdUtil(clID);
+                        int accID = accountMan.createClientAccount(account);
 
-                        JFrame confirmDialog = new JFrame();
-                        JOptionPane.showMessageDialog(confirmDialog, "Your account has successfully been created!");
+                        if (clID != 0) {
+                            if (accID != 0) {
+                                JFrame confirmDialog = new JFrame();
+                                JOptionPane.showMessageDialog(confirmDialog, "Client data has been successfully uploaded.");
+                            } else {
+                                JFrame confirmDialog = new JFrame();
+                                JOptionPane.showMessageDialog(confirmDialog, "There was a problem creating the account.");
+                            }
+                        } else {
+                            JFrame confirmDialog = new JFrame();
+                            JOptionPane.showMessageDialog(confirmDialog, "There was a problem uploading the client.");
+                        }
                     }
                 }
             });
@@ -2230,7 +2260,7 @@ public class Grafica {
                         JFrame warningDialog = new JFrame();
                         JOptionPane.showMessageDialog(warningDialog, "Trebuie completate toate campurile!", "Warning", JOptionPane.WARNING_MESSAGE);
                     } else {
-                        String birthdate = new String(year + "-" + month + "-" + day);
+                        String birthdate = year + "-" + month + "-" + day;
 
                         EmployeeManager empMan = new EmployeeManager();
                         AccountManager accMan = new AccountManager();
@@ -2245,9 +2275,9 @@ public class Grafica {
                         JFrame confirmDialog = new JFrame();
                         JOptionPane.showMessageDialog(confirmDialog, "Your account has successfully been created!");
 
-                        changePanel(mainMainPanel, size[0], size[1]);
-                        MenuBar();
-                        setTitle("DVDMania");
+//                        changePanel(mainMainPanel, size[0], size[1]);
+//                        MenuBar();
+//                        setTitle("DVDMania");
                     }
                 }
             });
@@ -2711,13 +2741,96 @@ public class Grafica {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Introduceti ID-ul produsului", "Warning", JOptionPane.WARNING_MESSAGE);
                             } else {
-                                //TODO: write order registration
-//                                Order order = new Order();
-//
-//                                String res = bazaDate.newOrder(idField.getText(), String.valueOf(table.getValueAt(table.getSelectedRow(), 0)),
-//                                        util.getCNP(), categorieBox.getSelectedItem().toString());
-//                                JFrame dialog = new JFrame();
-//                                JOptionPane.showMessageDialog(dialog, "Imprumutul a fost efectuat cu succes! \n Data scadenta este pe " + res);
+                                String cat = categorieBox.getSelectedItem().toString();
+                                StockManager stockMan = new StockManager();
+                                StoreManager storeMan = new StoreManager();
+                                Store store = storeMan.getStoreByEmployee(employee);
+                                switch (cat) {
+                                    case "Filme":
+                                        MovieManager movieMan = new MovieManager();
+                                        Movie movie = movieMan.getMovieById(Integer.parseInt(idField.getText()));
+                                        if (movie != null) {
+                                            int nrFilme = stockMan.checkMovieStock(movie, store);
+                                            if (nrFilme > 0) {
+                                                OrderManager orderMan = new OrderManager();
+
+                                                ClientManager clientMan = new ClientManager();
+                                                Client client = clientMan.getClientById(Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 0))));
+
+                                                if (client != null) {
+                                                    LocalDate dataRet = orderMan.checkOutMovieOrder(movie, client, employee);
+                                                    JFrame dialog = new JFrame();
+                                                    JOptionPane.showMessageDialog(dialog, "Produsul a fost inchiriat! Aceste trebuie returnat pana in data de " + dataRet, "Succes", JOptionPane.WARNING_MESSAGE);
+                                                } else {
+                                                    JFrame dialog = new JFrame();
+                                                    JOptionPane.showMessageDialog(dialog, "Produsul nu a fost inchiriat deoarece a aparut o problema. Incercati din nou!", "Warning", JOptionPane.WARNING_MESSAGE);
+                                                }
+                                            } else {
+                                                JFrame dialog = new JFrame();
+                                                JOptionPane.showMessageDialog(dialog, "Acest produs nu mai este in stoc.", "Warning", JOptionPane.WARNING_MESSAGE);
+                                            }
+                                        } else {
+                                            JFrame dialog = new JFrame();
+                                            JOptionPane.showMessageDialog(dialog, "Acest produs nu exista in baza de date!", "Warning", JOptionPane.WARNING_MESSAGE);
+                                        }
+                                        break;
+
+                                    case "Jocuri":
+                                        GameManager gameMan = new GameManager();
+                                        Game game = gameMan.getGameById(Integer.parseInt(idField.getText()));
+                                        if (game != null) {
+                                            int nrJocuri = stockMan.checkGameStock(game, store);
+                                            if (nrJocuri > 0) {
+                                                OrderManager orderMan = new OrderManager();
+
+                                                ClientManager clientMan = new ClientManager();
+                                                Client client = clientMan.getClientById(Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 0))));
+
+                                                if (client != null) {
+                                                    LocalDate dataRet = orderMan.checkOutGameOrder(game, client, employee);
+                                                    JFrame dialog = new JFrame();
+                                                    JOptionPane.showMessageDialog(dialog, "Produsul a fost inchiriat! Aceste trebuie returnat pana in data de " + dataRet, "Succes", JOptionPane.WARNING_MESSAGE);
+                                                } else {
+                                                    JFrame dialog = new JFrame();
+                                                    JOptionPane.showMessageDialog(dialog, "Produsul nu a fost inchiriat deoarece a aparut o problema. Incercati din nou!", "Warning", JOptionPane.WARNING_MESSAGE);
+                                                }
+                                            } else {
+                                                JFrame dialog = new JFrame();
+                                                JOptionPane.showMessageDialog(dialog, "Acest produs nu mai este in stoc.", "Warning", JOptionPane.WARNING_MESSAGE);
+                                            }
+                                        } else {
+                                            JFrame dialog = new JFrame();
+                                            JOptionPane.showMessageDialog(dialog, "Acest produs nu exista in baza de date!", "Warning", JOptionPane.WARNING_MESSAGE);
+                                        }
+                                        break;
+                                    case "Albume":
+                                        AlbumManager albumManager = new AlbumManager();
+                                        Album album = albumManager.getAlbumById(Integer.parseInt(idField.getText()));
+                                        if (album != null) {
+                                            int nrAlbume = stockMan.checkAlbumStock(album, store);
+                                            if (nrAlbume > 0) {
+                                                OrderManager orderMan = new OrderManager();
+
+                                                ClientManager clientMan = new ClientManager();
+                                                Client client = clientMan.getClientById(Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 0))));
+
+                                                if (client != null) {
+                                                    LocalDate dataRet = orderMan.checkOutAlbumOrder(album, client, employee);
+                                                    JFrame dialog = new JFrame();
+                                                    JOptionPane.showMessageDialog(dialog, "Produsul a fost inchiriat! Aceste trebuie returnat pana in data de " + dataRet, "Succes", JOptionPane.WARNING_MESSAGE);
+                                                } else {
+                                                    JFrame dialog = new JFrame();
+                                                    JOptionPane.showMessageDialog(dialog, "Produsul nu a fost inchiriat deoarece a aparut o problema. Incercati din nou!", "Warning", JOptionPane.WARNING_MESSAGE);
+                                                }
+                                            } else {
+                                                JFrame dialog = new JFrame();
+                                                JOptionPane.showMessageDialog(dialog, "Acest produs nu mai este in stoc.", "Warning", JOptionPane.WARNING_MESSAGE);
+                                            }
+                                        } else {
+                                            JFrame dialog = new JFrame();
+                                            JOptionPane.showMessageDialog(dialog, "Acest produs nu exista in baza de date!", "Warning", JOptionPane.WARNING_MESSAGE);
+                                        }
+                                }
                             }
                         }
                     });
@@ -2992,6 +3105,9 @@ public class Grafica {
                         frame.dispose();
                     }
                 });
+            } else {
+                JFrame dialog = new JFrame();
+                JOptionPane.showMessageDialog(dialog, "Sunteti logat ca si musafir. Creati mai intai un cont personal!", "Warning", JOptionPane.WARNING_MESSAGE);
             }
         }
 
@@ -3021,7 +3137,6 @@ public class Grafica {
             String[] columns = new String[]{"ID", "Titlu", "Actor principal", "Director", "Durata", "Gen", "An", "Audienta", "Pret"};
             mainTableModel.setColumnIdentifiers(columns);
 
-            StockManager stockMan = new StockManager();
             MovieManager movieMan = new MovieManager();
 
             for (int i = 0; i < contents.size(); i++) {
@@ -3137,7 +3252,7 @@ public class Grafica {
                     GameManager gameMan = new GameManager();
                     mainCategoriesList = gameMan.getGenres();
                     break;
-                case "Muzica":
+                case "Albume":
                     AlbumManager albumManager = new AlbumManager();
                     mainCategoriesList = albumManager.getGenres();
             }

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class AlbumManager {
 
-    ConnectionManager connMan = null;
+    ConnectionManager connMan = new ConnectionManager();
 
     public ArrayList<Album> getAllAlbums() {
         Connection connection = null;
@@ -19,6 +19,7 @@ public class AlbumManager {
         try {
             connection = connMan.openConnection();
             String sql = "SELECT id_album, trupa, titlu, nr_mel, casa_disc, gen, an FROM albume";
+            statement = connection.createStatement();
             result = statement.executeQuery(sql);
 
             while (result.next()) {
@@ -129,8 +130,8 @@ public class AlbumManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "SELECT titlu, trupa, nr_mel, casa_disc, gen, an FROM dvdmania.jocuri WHERE id_album=?";
-            connection.prepareStatement(sql);
+            String sql = "SELECT titlu, trupa, nr_mel, casa_disc, gen, an FROM albume WHERE id_album=?";
+            statement = connection.prepareStatement(sql);
             statement.setInt(1, id);
             result = statement.executeQuery();
 
@@ -164,7 +165,7 @@ public class AlbumManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "INSERT INTO dvdmania.jocuri (titlu, trupa, nr_mel , casa_disc, gen, an) VALUES (?, ?, ?, ?, ?, YEAR(?))";
+            String sql = "INSERT INTO albume (titlu, trupa, nr_mel , casa_disc, gen, an) VALUES (?, ?, ?, ?, ?, YEAR(?))";
             statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             statement.setString(1, album.getTitle());
             statement.setString(2, album.getArtist());
@@ -201,7 +202,7 @@ public class AlbumManager {
         try {
             connection = connMan.openConnection();
             String sql = "UPDATE dvdmania.albume SET titlu=?, trupa=?, nr_mel=?, casa_disc=?, gen=?, an=YEAR(?) WHERE id_album=?";
-            connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sql);
             statement.setString(1, album.getTitle());
             statement.setString(2, album.getArtist());
             statement.setInt(3, album.getNrMel());
@@ -284,6 +285,7 @@ public class AlbumManager {
         try {
             connection = connMan.openConnection();
             String sql = "SELECT DISTINCT gen FROM dvdmania.albume";
+            statement = connection.createStatement();
             result = statement.executeQuery(sql);
 
             genres.add("Toate");

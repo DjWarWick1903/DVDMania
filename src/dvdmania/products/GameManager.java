@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 public class GameManager {
 
-    ConnectionManager connMan = null;
+    ConnectionManager connMan = new ConnectionManager();
 
     public ArrayList<Game> getAllGames() {
         Connection connection = null;
@@ -132,8 +132,8 @@ public class GameManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "SELECT titlu, an, platforma, developer, publisher, gen, audienta FROM dvdmania.jocuri WHERE id_joc=?";
-            connection.prepareStatement(sql);
+            String sql = "SELECT titlu, an, platforma, developer, publisher, gen, audienta FROM jocuri WHERE id_joc=?";
+            statement = connection.prepareStatement(sql);
             statement.setInt(1, id);
             result = statement.executeQuery();
 
@@ -168,8 +168,8 @@ public class GameManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "INSERT INTO dvdmania.jocuri (titlu, platforma, developer, publisher, gen, an, audienta) VALUES (?, ?, ?, ?, ?, YEAR(?), ?)";
-            connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
+            String sql = "INSERT INTO jocuri (titlu, platforma, developer, publisher, gen, an, audienta) VALUES (?, ?, ?, ?, ?, YEAR(?), ?)";
+            statement = connection.prepareStatement(sql, PreparedStatement.RETURN_GENERATED_KEYS);
             statement.setString(1, game.getTitle());
             statement.setString(2, game.getPlatform());
             statement.setString(3, game.getDeveloper());
@@ -205,7 +205,7 @@ public class GameManager {
         try {
             connection = connMan.openConnection();
             String sql = "UPDATE dvdmania.jocuri SET titlu=?, platforma=?, developer=?, publisher=?, gen=?, an=YEAR(?), audienta=? WHERE id_joc=?";
-            connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sql);
             statement.setString(1, game.getTitle());
             statement.setString(2, game.getPlatform());
             statement.setString(3, game.getDeveloper());
@@ -213,6 +213,7 @@ public class GameManager {
             statement.setString(5, game.getGenre());
             statement.setDate(6, Date.valueOf(game.getYear() + "-01-01"));
             statement.setInt(7, game.getAudience());
+            statement.setInt(8, game.getIdGame());
             rowsUpdated = statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -260,6 +261,7 @@ public class GameManager {
         try {
             connection = connMan.openConnection();
             String sql = "SELECT DISTINCT gen FROM dvdmania.jocuri";
+            statement = connection.createStatement();
             result = statement.executeQuery(sql);
 
             genres.add("Toate");

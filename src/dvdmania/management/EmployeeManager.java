@@ -17,8 +17,8 @@ public class EmployeeManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "INSERT INTO dvdmania.angajati (nume, pren, adresa, oras, " +
-                    "datan, cnp, tel, email, functie, salariu, activ, id_mag " +
+            String sql = "INSERT INTO angajati(nume, pren, adresa, oras, " +
+                    "datan, cnp, tel, email, functie, salariu, activ, id_mag) " +
                     "VALUES (?,?,?,?,?,?,?,?,?,?,?,?)";
             statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, employee.getNume());
@@ -108,7 +108,7 @@ public class EmployeeManager {
             connection = connMan.openConnection();
             String sql = "SELECT a.nume, a.pren, a.adresa, a.oras, a.datan, " +
                     "a.cnp, a.tel, a.email, a.functie, a.salariu, m.id_mag FROM angajati a " +
-                    "JOIN magazin m ON m.id_mag=a.id_mag AND a.activ='Activ' AND a.id_angaj=?";
+                    "JOIN magazin m ON m.id_mag=a.id_mag WHERE a.activ='Activ' AND a.id_angaj=?";
             statement = connection.prepareStatement(sql);
             statement.setInt(1, id);
             result = statement.executeQuery();
@@ -147,7 +147,7 @@ public class EmployeeManager {
     public ArrayList<Employee> getEmployees() {
         ArrayList<Employee> employees = new ArrayList<>();
         Connection connection = null;
-        PreparedStatement statement = null;
+        Statement statement = null;
         ResultSet result = null;
 
         try {
@@ -155,6 +155,7 @@ public class EmployeeManager {
             String sql = "SELECT a.id_angaj, a.nume, a.pren, a.adresa, a.oras, a.datan, " +
                     "a.cnp, a.tel, a.email, a.functie, a.salariu, m.id_mag FROM dvdmania.angajati a, " +
                     "dvdmania.magazin m WHERE m.id_mag=a.id_mag AND a.activ='Activ'";
+            statement = connection.createStatement();
             result = statement.executeQuery(sql);
 
             while (result.next()) {

@@ -52,7 +52,7 @@ public class StoreManager {
         try {
             connection = connMan.openConnection();
             String sql = "SELECT id_mag, adresa, tel FROM dvdmania.magazin WHERE oras=?";
-            connection.prepareStatement(sql);
+            statement = connection.prepareStatement(sql);
             statement.setString(1, city);
             result = statement.executeQuery();
 
@@ -208,8 +208,8 @@ public class StoreManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "SELECT m.id_mag, m.adresa, m.oras, m.tel FROM magazin m JOIN angajati a USING(id_mag) WHERE id_ang=?";
-            connection.prepareStatement(sql);
+            String sql = "SELECT m.id_mag, m.adresa, m.oras, m.tel FROM magazin m JOIN angajati a USING(id_mag) WHERE a.id_angaj=?";
+            statement = connection.prepareStatement(sql);
             statement.setInt(1, employee.getIdEmp());
             result = statement.executeQuery();
 

@@ -205,7 +205,7 @@ public class MovieManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "UPDATE dvdmania.filme SET titlu=?, actor_pr=?, director=?, durata=?, gen=?, an=YEAR(?), audienta=? WHERE id_film=?";
+            String sql = "UPDATE filme SET titlu=?, actor_pr=?, director=?, durata=?, gen=?, an=YEAR(?), audienta=? WHERE id_film=?";
             statement = connection.prepareStatement(sql);
             statement.setString(1, movie.getTitle());
             statement.setString(2, movie.getMainActor());
@@ -214,6 +214,7 @@ public class MovieManager {
             statement.setString(5, movie.getGenre());
             statement.setDate(6, Date.valueOf(movie.getYear() + "-01-01"));
             statement.setInt(7, movie.getAudience());
+            statement.setInt(8, movie.getIdMovie());
             rowsInserted = statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();

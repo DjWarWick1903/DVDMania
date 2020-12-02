@@ -63,12 +63,13 @@ public class ClientManager {
         try {
             connection = connMan.openConnection();
             String sql = "SELECT id_cl, nume, pren, adresa, oras, datan, cnp, tel, email, loialitate FROM clienti";
+            statement = connection.createStatement();
             result = statement.executeQuery(sql);
 
             while (result.next()) {
                 int id = result.getInt("id_cl");
                 String nume = result.getString("nume");
-                String prenume = result.getString("prenume");
+                String prenume = result.getString("pren");
                 String adress = result.getString("adresa");
                 String oras = result.getString("oras");
                 LocalDate date = result.getDate("datan").toLocalDate();
@@ -144,7 +145,7 @@ public class ClientManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "UPDATE dvdmania.clienti SET nume=?, pren=?, adresa=?, oras=?, datan=?, cnp=?, tel=?, email=? loialitate=? WHERE id_cl=?";
+            String sql = "UPDATE dvdmania.clienti SET nume=?, pren=?, adresa=?, oras=?, datan=?, cnp=?, tel=?, email=?, loialitate=? WHERE id_cl=?";
 
             statement = connection.prepareStatement(sql);
             statement.setString(1, client.getNume());

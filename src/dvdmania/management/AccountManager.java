@@ -89,7 +89,7 @@ public class AccountManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "UPDATE conturi(util, parola) VALUES(?,?) WHERE id_cl=?";
+            String sql = "UPDATE conturi SET util=?, parola=? WHERE id_cl=?";
             statement = connection.prepareStatement(sql);
             statement.setString(1, account.getUsername());
             statement.setString(2, account.getPassword());
@@ -119,7 +119,7 @@ public class AccountManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "UPDATE conturi(util, parola) VALUES(?,?) WHERE id_ang=?";
+            String sql = "UPDATE conturi SET util=?, parola=? WHERE id_angaj=?";
             statement = connection.prepareStatement(sql);
             statement.setString(1, account.getUsername());
             statement.setString(2, account.getPassword());
@@ -150,7 +150,7 @@ public class AccountManager {
 
         try {
             connection = connMan.openConnection();
-            String sql = "SELECT id_cont, util, parola, data_creat FROM conturi WHERE id_ang=?";
+            String sql = "SELECT id_cont, util, parola, data_creat FROM conturi WHERE id_angaj=?";
             statement = connection.prepareStatement(sql);
             statement.setInt(1, employee.getIdEmp());
             result = statement.executeQuery();
