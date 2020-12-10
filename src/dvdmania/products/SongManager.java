@@ -10,7 +10,19 @@ import java.util.ArrayList;
 
 public class SongManager {
 
-    ConnectionManager connMan = new ConnectionManager();
+    ConnectionManager connMan = ConnectionManager.getInstance();
+    private static SongManager instance = null;
+
+    private SongManager() {
+    }
+
+    public static SongManager getInstance() {
+        if (instance == null) {
+            instance = new SongManager();
+        }
+
+        return instance;
+    }
 
     public ArrayList<Song> getSongs(int idAlbum) {
         Connection connection = null;

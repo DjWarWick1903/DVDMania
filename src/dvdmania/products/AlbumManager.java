@@ -8,7 +8,19 @@ import java.util.ArrayList;
 
 public class AlbumManager {
 
-    ConnectionManager connMan = new ConnectionManager();
+    ConnectionManager connMan = ConnectionManager.getInstance();
+    private static AlbumManager instance = null;
+
+    private AlbumManager() {
+    }
+
+    public static AlbumManager getInstance() {
+        if (instance == null) {
+            instance = new AlbumManager();
+        }
+
+        return instance;
+    }
 
     public ArrayList<Album> getAllAlbums() {
         Connection connection = null;

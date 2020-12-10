@@ -8,7 +8,19 @@ import java.util.LinkedList;
 
 public class StoreManager {
 
-    ConnectionManager connMan = new ConnectionManager();
+    ConnectionManager connMan = ConnectionManager.getInstance();
+    private static StoreManager instance = null;
+
+    private StoreManager() {
+    }
+
+    public static StoreManager getInstance() {
+        if (instance == null) {
+            instance = new StoreManager();
+        }
+
+        return instance;
+    }
 
     public Store getStoreById(int id) {
         Connection connection = null;

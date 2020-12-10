@@ -9,7 +9,19 @@ import java.util.Iterator;
 
 public class StockManager {
 
-    ConnectionManager connMan = new ConnectionManager();
+    ConnectionManager connMan = ConnectionManager.getInstance();
+    private static StockManager instance = null;
+
+    private StockManager() {
+    }
+
+    public static StockManager getInstance() {
+        if (instance == null) {
+            instance = new StockManager();
+        }
+
+        return instance;
+    }
 
     public Stock getStockById(int id) {
         Connection connection = null;
@@ -38,17 +50,17 @@ public class StockManager {
                 stock.setQuantity(quantity);
                 stock.setPrice(price);
                 if (idMovie != 0) {
-                    MovieManager movieMan = new MovieManager();
+                    MovieManager movieMan = MovieManager.getInstance();
                     stock.setMovie(movieMan.getMovieById(idMovie));
                 } else if (idGame != 0) {
-                    GameManager gameMan = new GameManager();
+                    GameManager gameMan = GameManager.getInstance();
                     stock.setGame(gameMan.getGameById(idGame));
                 } else if (idAlbum != 0) {
-                    AlbumManager albumMan = new AlbumManager();
+                    AlbumManager albumMan = AlbumManager.getInstance();
                     stock.setAlbum(albumMan.getAlbumById(idAlbum));
                 }
 
-                StoreManager storeMan = new StoreManager();
+                StoreManager storeMan = StoreManager.getInstance();
                 stock.setStore(storeMan.getStoreById(idStore));
             }
         } catch (SQLException e) {
@@ -109,9 +121,9 @@ public class StockManager {
         Iterator iter = stockList.iterator();
         while (iter.hasNext()) {
             Stock stock = (Stock) iter.next();
-            MovieManager movieMan = new MovieManager();
+            MovieManager movieMan = MovieManager.getInstance();
             stock.setMovie(movieMan.getMovieById(stock.getMovie().getIdMovie()));
-            StoreManager storeMan = new StoreManager();
+            StoreManager storeMan = StoreManager.getInstance();
             stock.setStore(storeMan.getStoreById(stock.getStore().getId()));
         }
 
@@ -164,13 +176,13 @@ public class StockManager {
         while (iter.hasNext()) {
             Stock stock = (Stock) iter.next();
 
-            AlbumManager albumMan = new AlbumManager();
+            AlbumManager albumMan = AlbumManager.getInstance();
             stock.setAlbum(albumMan.getAlbumById(stock.getAlbum().getIdAlbum()));
 
-            StoreManager storeMan = new StoreManager();
+            StoreManager storeMan = StoreManager.getInstance();
             stock.setStore(storeMan.getStoreById(stock.getStore().getId()));
 
-            SongManager songMan = new SongManager();
+            SongManager songMan = SongManager.getInstance();
             Album album = stock.getAlbum();
             album.setSongs(songMan.getSongs(album.getIdAlbum()));
         }
@@ -208,9 +220,9 @@ public class StockManager {
                 store.setId(idStore);
                 stock.setStore(store);
 
-                GameManager gameMan = new GameManager();
+                GameManager gameMan = GameManager.getInstance();
                 stock.setGame(gameMan.getGameById(idGame));
-                StoreManager storeMan = new StoreManager();
+                StoreManager storeMan = StoreManager.getInstance();
                 stock.setStore(storeMan.getStoreById(idStore));
 
                 stockList.add(stock);
@@ -229,9 +241,9 @@ public class StockManager {
         while (iter.hasNext()) {
             Stock stock = (Stock) iter.next();
 
-            GameManager gameMan = new GameManager();
+            GameManager gameMan = GameManager.getInstance();
             stock.setGame(gameMan.getGameById(stock.getGame().getIdGame()));
-            StoreManager storeMan = new StoreManager();
+            StoreManager storeMan = StoreManager.getInstance();
             stock.setStore(storeMan.getStoreById(stock.getStore().getId()));
         }
 
@@ -262,9 +274,9 @@ public class StockManager {
                 stock.setIdProduct(idStock);
                 stock.setQuantity(quantity);
                 stock.setPrice(price);
-                MovieManager movieMan = new MovieManager();
+                MovieManager movieMan = MovieManager.getInstance();
                 stock.setMovie(movieMan.getMovieById(idMovie));
-                StoreManager storeMan = new StoreManager();
+                StoreManager storeMan = StoreManager.getInstance();
                 stock.setStore(storeMan.getStoreById(idStore));
 
                 stockList.add(stock);
@@ -306,12 +318,12 @@ public class StockManager {
                 stock.setIdProduct(idStock);
                 stock.setQuantity(quantity);
                 stock.setPrice(price);
-                AlbumManager albumMan = new AlbumManager();
+                AlbumManager albumMan = AlbumManager.getInstance();
                 stock.setAlbum(albumMan.getAlbumById(idAlbum));
-                StoreManager storeMan = new StoreManager();
+                StoreManager storeMan = StoreManager.getInstance();
                 stock.setStore(storeMan.getStoreById(idStore));
 
-                SongManager songMan = new SongManager();
+                SongManager songMan = SongManager.getInstance();
                 Album album = stock.getAlbum();
                 album.setSongs(songMan.getSongs(album.getIdAlbum()));
 
@@ -354,9 +366,9 @@ public class StockManager {
                 stock.setIdProduct(idStock);
                 stock.setQuantity(quantity);
                 stock.setPrice(price);
-                GameManager gameMan = new GameManager();
+                GameManager gameMan = GameManager.getInstance();
                 stock.setGame(gameMan.getGameById(idGame));
-                StoreManager storeMan = new StoreManager();
+                StoreManager storeMan = StoreManager.getInstance();
                 stock.setStore(storeMan.getStoreById(idStore));
 
                 stockList.add(stock);
@@ -677,7 +689,7 @@ public class StockManager {
             rowsDeleted = statement.executeUpdate();
 
             if (checkMovieStock(movie) == 0) {
-                MovieManager movieMan = new MovieManager();
+                MovieManager movieMan = MovieManager.getInstance();
                 movieMan.deleteMovie(movie);
             }
         } catch (SQLException e) {
@@ -708,7 +720,7 @@ public class StockManager {
             rowsDeleted = statement.executeUpdate();
 
             if (checkGameStock(game) == 0) {
-                GameManager gameMan = new GameManager();
+                GameManager gameMan = GameManager.getInstance();
                 gameMan.deleteGame(game);
             }
         } catch (SQLException e) {
@@ -739,7 +751,7 @@ public class StockManager {
             rowsDeleted = statement.executeUpdate();
 
             if (checkAlbumStock(album) == 0) {
-                AlbumManager albumMan = new AlbumManager();
+                AlbumManager albumMan = AlbumManager.getInstance();
                 albumMan.deleteAlbum(album);
             }
         } catch (SQLException e) {
@@ -806,7 +818,7 @@ public class StockManager {
                     break;
                 }
 
-                OrderManager orderMan = new OrderManager();
+                OrderManager orderMan = OrderManager.getInstance();
                 int activeOrders = orderMan.getActiveOrders(idProd, store.getId());
 
                 stock = quantity - activeOrders;
@@ -875,7 +887,7 @@ public class StockManager {
                     break;
                 }
 
-                OrderManager orderMan = new OrderManager();
+                OrderManager orderMan = OrderManager.getInstance();
                 int activeOrders = orderMan.getActiveOrders(idProd, store.getId());
 
                 stock = quantity - activeOrders;
@@ -944,7 +956,7 @@ public class StockManager {
                     break;
                 }
 
-                OrderManager orderMan = new OrderManager();
+                OrderManager orderMan = OrderManager.getInstance();
                 int activeOrders = orderMan.getActiveOrders(idProd, store.getId());
 
                 stock = quantity - activeOrders;

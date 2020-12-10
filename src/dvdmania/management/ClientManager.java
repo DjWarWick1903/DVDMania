@@ -8,7 +8,19 @@ import java.util.ArrayList;
 
 public class ClientManager {
 
-    ConnectionManager connMan = new ConnectionManager();
+    ConnectionManager connMan = ConnectionManager.getInstance();
+    private static ClientManager instance = null;
+
+    private ClientManager() {
+    }
+
+    public static ClientManager getInstance() {
+        if (instance == null) {
+            instance = new ClientManager();
+        }
+
+        return instance;
+    }
 
     public Client getClientById(int id) {
         Connection connection = null;
@@ -37,7 +49,7 @@ public class ClientManager {
 
                 client = new Client(id, nume, prenume, adress, oras, date, cnp, tel, email, loyal);
 
-                AccountManager accMan = new AccountManager();
+                AccountManager accMan = AccountManager.getInstance();
                 Account account = accMan.getClientAccount(client);
                 client.setAccount(account);
             }
@@ -79,7 +91,7 @@ public class ClientManager {
                 int loyal = result.getInt("loialitate");
 
                 Client client = new Client(id, nume, prenume, adress, oras, date, cnp, tel, email, loyal);
-                AccountManager accMan = new AccountManager();
+                AccountManager accMan = AccountManager.getInstance();
                 Account account = accMan.getClientAccount(client);
                 client.setAccount(account);
                 clientList.add(client);

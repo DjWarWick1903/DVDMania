@@ -8,7 +8,19 @@ import java.util.ArrayList;
 
 public class MovieManager {
 
-    ConnectionManager connMan = new ConnectionManager();
+    ConnectionManager connMan = ConnectionManager.getInstance();
+    private static MovieManager instance = null;
+
+    private MovieManager() {
+    }
+
+    public static MovieManager getInstance() {
+        if (instance == null) {
+            instance = new MovieManager();
+        }
+
+        return instance;
+    }
 
     public ArrayList<Movie> getAllMovies() {
         Connection connection = null;

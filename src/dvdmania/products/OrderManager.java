@@ -12,7 +12,19 @@ import java.util.ArrayList;
 
 public class OrderManager {
 
-    ConnectionManager connMan = new ConnectionManager();
+    ConnectionManager connMan = ConnectionManager.getInstance();
+    private static OrderManager instance = null;
+
+    private OrderManager() {
+    }
+
+    public static OrderManager getInstance() {
+        if (instance == null) {
+            instance = new OrderManager();
+        }
+
+        return instance;
+    }
 
     public int checkAvailability(Stock stock, Store store) {
         Connection connection = null;
@@ -89,7 +101,7 @@ public class OrderManager {
         ResultSet result = null;
         LocalDate date = null;
 
-        StockManager stockMan = new StockManager();
+        StockManager stockMan = StockManager.getInstance();
         Store store = new Store();
         store.setId(employee.getIdMag());
         Stock stock = stockMan.getMovieStock(movie, store);
@@ -131,7 +143,7 @@ public class OrderManager {
         ResultSet result = null;
         LocalDate date = null;
 
-        StockManager stockMan = new StockManager();
+        StockManager stockMan = StockManager.getInstance();
         Store store = new Store();
         store.setId(employee.getIdMag());
         Stock stock = stockMan.getGameStock(game, store);
@@ -173,7 +185,7 @@ public class OrderManager {
         ResultSet result = null;
         LocalDate date = null;
 
-        StockManager stockMan = new StockManager();
+        StockManager stockMan = StockManager.getInstance();
         Store store = new Store();
         store.setId(employee.getIdMag());
         Stock stock = stockMan.getAlbumStock(album, store);
@@ -223,9 +235,9 @@ public class OrderManager {
             statement.setInt(1, store.getId());
             result = statement.executeQuery();
 
-            StockManager stockMan = new StockManager();
-            ClientManager clientMan = new ClientManager();
-            EmployeeManager empMan = new EmployeeManager();
+            StockManager stockMan = StockManager.getInstance();
+            ClientManager clientMan = ClientManager.getInstance();
+            EmployeeManager empMan = EmployeeManager.getInstance();
 
             while (result.next()) {
                 int idStock = result.getInt("id_prod");
@@ -268,9 +280,9 @@ public class OrderManager {
             statement.setInt(1, store.getId());
             result = statement.executeQuery();
 
-            StockManager stockMan = new StockManager();
-            ClientManager clientMan = new ClientManager();
-            EmployeeManager empMan = new EmployeeManager();
+            StockManager stockMan = StockManager.getInstance();
+            ClientManager clientMan = ClientManager.getInstance();
+            EmployeeManager empMan = EmployeeManager.getInstance();
 
             while (result.next()) {
                 int idStock = result.getInt("id_prod");
@@ -314,9 +326,9 @@ public class OrderManager {
             statement.setInt(1, client.getId());
             result = statement.executeQuery();
 
-            StockManager stockMan = new StockManager();
-            StoreManager storeMan = new StoreManager();
-            EmployeeManager empMan = new EmployeeManager();
+            StockManager stockMan = StockManager.getInstance();
+            StoreManager storeMan = StoreManager.getInstance();
+            EmployeeManager empMan = EmployeeManager.getInstance();
 
             while (result.next()) {
                 int idStock = result.getInt("id_prod");

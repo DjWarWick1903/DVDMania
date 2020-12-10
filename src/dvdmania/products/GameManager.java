@@ -8,7 +8,19 @@ import java.util.ArrayList;
 
 public class GameManager {
 
-    ConnectionManager connMan = new ConnectionManager();
+    ConnectionManager connMan = ConnectionManager.getInstance();
+    private static GameManager instance = null;
+
+    private GameManager() {
+    }
+
+    public static GameManager getInstance() {
+        if (instance == null) {
+            instance = new GameManager();
+        }
+
+        return instance;
+    }
 
     public ArrayList<Game> getAllGames() {
         Connection connection = null;

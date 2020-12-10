@@ -121,7 +121,7 @@ public class Grafica {
                     String usrname = logUsernameText.getText();
                     String password = String.valueOf(logPasswordText.getPassword());
 
-                    AccountManager accMan = new AccountManager();
+                    AccountManager accMan = AccountManager.getInstance();
                     account = new Account();
                     account.setUsername(usrname);
                     account.setPassword(password);
@@ -131,10 +131,10 @@ public class Grafica {
                         priv = accMan.checkAccountPrivilege(account);
 
                         if (priv == 1) {
-                            ClientManager clientMan = new ClientManager();
+                            ClientManager clientMan = ClientManager.getInstance();
                             client = clientMan.getClientById(account.getIdUtil());
                         } else if (priv == 2 || priv == 3) {
-                            EmployeeManager empMan = new EmployeeManager();
+                            EmployeeManager empMan = EmployeeManager.getInstance();
                             employee = empMan.getEmployeeById(account.getIdUtil());
                         }
 
@@ -333,8 +333,8 @@ public class Grafica {
                         client = new Client(0, lastName, firstName, address, city, date, cnp, phone, email, 5);
                         priv = 1;
 
-                        ClientManager clientMan = new ClientManager();
-                        AccountManager accMan = new AccountManager();
+                        ClientManager clientMan = ClientManager.getInstance();
+                        AccountManager accMan = AccountManager.getInstance();
 
                         int clientInserted = clientMan.createClient(client);
                         account = new Account(0, username, password, null, 1, client.getId());
@@ -577,10 +577,10 @@ public class Grafica {
             mainJocuriButton = new JButton("Jocuri");
             mainAlbumeButton = new JButton("Albume");
 
-            MovieManager movieMan = new MovieManager();
-            StoreManager storeMan = new StoreManager();
-            SongManager songMan = new SongManager();
-            StockManager stockMan = new StockManager();
+            MovieManager movieMan = MovieManager.getInstance();
+            StoreManager storeMan = StoreManager.getInstance();
+            SongManager songMan = SongManager.getInstance();
+            StockManager stockMan = StockManager.getInstance();
 
             mainCategoriesList = movieMan.getGenres();
             mainStoresList = storeMan.getStores();
@@ -683,8 +683,8 @@ public class Grafica {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
-                        StoreManager storeMan = new StoreManager();
-                        StockManager stockMan = new StockManager();
+                        StoreManager storeMan = StoreManager.getInstance();
+                        StockManager stockMan = StockManager.getInstance();
 
                         String selectedStore = mainStoreBox.getSelectedItem().toString();
                         switch (categorieCurenta) {
@@ -726,7 +726,7 @@ public class Grafica {
                     updateComboBox("Filme");
                     mainCategoryBox.setSelectedItem("Toate");
                     mainStoreBox.setSelectedItem("Toate");
-                    StockManager stockMan = new StockManager();
+                    StockManager stockMan = StockManager.getInstance();
                     mainProduseList = stockMan.getAllMovieStock();
                     mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
                 }
@@ -739,8 +739,9 @@ public class Grafica {
                     updateComboBox("Jocuri");
                     mainCategoryBox.setSelectedItem("Toate");
                     mainStoreBox.setSelectedItem("Toate");
-                    StockManager stockMan = new StockManager();
+                    StockManager stockMan = StockManager.getInstance();
                     mainProduseList = stockMan.getAllGameStock();
+                    System.out.println("action listener");
                     mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
                 }
             });
@@ -752,7 +753,7 @@ public class Grafica {
                     updateComboBox("Albume");
                     mainCategoryBox.setSelectedItem("Toate");
                     mainStoreBox.setSelectedItem("Toate");
-                    StockManager stockMan = new StockManager();
+                    StockManager stockMan = StockManager.getInstance();
                     mainProduseList = stockMan.getAllAlbumStock();
                     mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
                 }
@@ -768,12 +769,12 @@ public class Grafica {
                         } else {
                             int id = Integer.parseInt(String.valueOf(mainProdTable.getValueAt(mainProdTable.getSelectedRow(), 0)));
                             int nrTot = 0;
-                            StockManager stockMan = new StockManager();
-                            StoreManager storeMan = new StoreManager();
+                            StockManager stockMan = StockManager.getInstance();
+                            StoreManager storeMan = StoreManager.getInstance();
                             Store store = null;
                             switch (categorieCurenta) {
                                 case "Filme":
-                                    MovieManager movieMan = new MovieManager();
+                                    MovieManager movieMan = MovieManager.getInstance();
 
                                     Movie movie = movieMan.getMovieById(id);
                                     if (priv == 1) {
@@ -784,7 +785,7 @@ public class Grafica {
                                     nrTot = stockMan.checkMovieStock(movie, store);
                                     break;
                                 case "Jocuri":
-                                    GameManager gameMan = new GameManager();
+                                    GameManager gameMan = GameManager.getInstance();
 
                                     Game game = gameMan.getGameById(id);
                                     if (priv == 1) {
@@ -795,7 +796,7 @@ public class Grafica {
                                     nrTot = stockMan.checkGameStock(game, store);
                                     break;
                                 case "Albume":
-                                    AlbumManager albumMan = new AlbumManager();
+                                    AlbumManager albumMan = AlbumManager.getInstance();
 
                                     Album album = albumMan.getAlbumById(id);
                                     if (priv == 1) {
@@ -1014,9 +1015,9 @@ public class Grafica {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
                             } else {
-                                MovieManager movieMan = new MovieManager();
-                                StockManager stockMan = new StockManager();
-                                StoreManager storeMan = new StoreManager();
+                                MovieManager movieMan = MovieManager.getInstance();
+                                StockManager stockMan = StockManager.getInstance();
+                                StoreManager storeMan = StoreManager.getInstance();
 
                                 Movie movie = new Movie(0, titlu, actor, director, Integer.parseInt(durata), gen, an, Integer.parseInt(audienta));
                                 Store store = storeMan.getStoreByCity(employee.getOras());
@@ -1115,9 +1116,9 @@ public class Grafica {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
                             } else {
-                                GameManager gameMan = new GameManager();
-                                StockManager stockMan = new StockManager();
-                                StoreManager storeMan = new StoreManager();
+                                GameManager gameMan = GameManager.getInstance();
+                                StockManager stockMan = StockManager.getInstance();
+                                StoreManager storeMan = StoreManager.getInstance();
 
                                 Game game = new Game(0, titlu, an, platforma, developer, publisher, gen, Integer.parseInt(audienta));
                                 Store store = storeMan.getStoreByCity(employee.getOras());
@@ -1211,9 +1212,9 @@ public class Grafica {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
                             } else {
-                                AlbumManager albumMan = new AlbumManager();
-                                StockManager stockMan = new StockManager();
-                                StoreManager storeMan = new StoreManager();
+                                AlbumManager albumMan = AlbumManager.getInstance();
+                                StockManager stockMan = StockManager.getInstance();
+                                StoreManager storeMan = StoreManager.getInstance();
 
                                 Album album = new Album(0, titlu, trupa, Integer.parseInt(melodii), casaDisc, gen, an);
                                 Store store = storeMan.getStoreByCity(employee.getOras());
@@ -1247,7 +1248,7 @@ public class Grafica {
                     newSongDurataLabel = new JLabel("Durata:");
                     newSongDurataField = new JTextField();
                     newSongAlbumLabel = new JLabel("Album");
-                    AlbumManager albumMan = new AlbumManager();
+                    AlbumManager albumMan = AlbumManager.getInstance();
                     ArrayList<Album> albume = albumMan.getAllAlbums();
                     ArrayList<String> numeAlbume = new ArrayList<>();
                     Iterator iterator = albume.iterator();
@@ -1291,7 +1292,7 @@ public class Grafica {
                                 JFrame dialog = new JFrame();
                                 JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
                             } else {
-                                SongManager songMan = new SongManager();
+                                SongManager songMan = SongManager.getInstance();
                                 Iterator iterator = albume.iterator();
                                 while (iterator.hasNext()) {
                                     Album album = (Album) iterator.next();
@@ -1365,10 +1366,10 @@ public class Grafica {
                 public void actionPerformed(ActionEvent e) {
                     JButton save, exit, delete;
                     JPanel secondWindowMain, secondWindowDetalii, secondWindowButoane;
-                    StockManager stockMan = new StockManager();
-                    MovieManager movieMan = new MovieManager();
-                    GameManager gameMan = new GameManager();
-                    AlbumManager albumMan = new AlbumManager();
+                    StockManager stockMan = StockManager.getInstance();
+                    MovieManager movieMan = MovieManager.getInstance();
+                    GameManager gameMan = GameManager.getInstance();
+                    AlbumManager albumMan = AlbumManager.getInstance();
 
                     if (editCategorieBox.getSelectedItem().equals("Filme")) {
                         JLabel editProdTitluLabel, editProdActorLabel, editProdDirectorLabel, editProdDurataLabel, editProdGenLabel, editProdAnLabel, editProdAudientaLabel,
@@ -1898,8 +1899,8 @@ public class Grafica {
 
                         Client client = new Client(0, lastName, firstName, address, city, LocalDate.parse(birthdate), cnp, phone, (email.isEmpty()) ? null : email, 5);
                         Account account = new Account(0, username, password, null, 1, client.getId());
-                        AccountManager accountMan = new AccountManager();
-                        ClientManager clientMan = new ClientManager();
+                        AccountManager accountMan = AccountManager.getInstance();
+                        ClientManager clientMan = ClientManager.getInstance();
 
                         int clID = clientMan.createClient(client);
                         account.setIdUtil(clID);
@@ -1923,7 +1924,7 @@ public class Grafica {
         }
 
         private void editCustomerWindow() {
-            ClientManager clientMan = new ClientManager();
+            ClientManager clientMan = ClientManager.getInstance();
             ArrayList<Client> customers = clientMan.getAllClients();
             JTable table = new JTable();
             DefaultTableModel tableModel;
@@ -2050,7 +2051,7 @@ public class Grafica {
                                 JFrame f = new JFrame();
                                 int a = JOptionPane.showConfirmDialog(f, "Are you sure?", "Saving", JOptionPane.YES_NO_OPTION);
                                 if(a == JOptionPane.YES_OPTION) {
-                                    AccountManager accMan = new AccountManager();
+                                    AccountManager accMan = AccountManager.getInstance();
 
                                     Client client = new Client();
                                     client.setId(Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 0))));
@@ -2148,7 +2149,7 @@ public class Grafica {
 
             //Magazin
             JLabel newMagLabel = new JLabel("Magazin:");
-            StoreManager storeMan = new StoreManager();
+            StoreManager storeMan = StoreManager.getInstance();
             ArrayList<Store> stores = storeMan.getStores();
             ArrayList<String> cities = new ArrayList<>();
             Iterator iter = stores.iterator();
@@ -2262,9 +2263,9 @@ public class Grafica {
                     } else {
                         String birthdate = year + "-" + month + "-" + day;
 
-                        EmployeeManager empMan = new EmployeeManager();
-                        AccountManager accMan = new AccountManager();
-                        StoreManager storeMan = new StoreManager();
+                        EmployeeManager empMan = EmployeeManager.getInstance();
+                        AccountManager accMan = AccountManager.getInstance();
+                        StoreManager storeMan = StoreManager.getInstance();
                         Store store = storeMan.getStoreByCity(mag);
 
                         Employee emp = new Employee(0, lastName, firstName, address, city, LocalDate.parse(birthdate), cnp, phone, email, functie, Integer.parseInt(salariu), true, store.getId());
@@ -2284,7 +2285,7 @@ public class Grafica {
         }
 
         private void editEmployeeWindow() {
-            EmployeeManager empMan = new EmployeeManager();
+            EmployeeManager empMan = EmployeeManager.getInstance();
             ArrayList<Employee> employees = empMan.getEmployees();
             JTable table = new JTable();
             DefaultTableModel tableModel;
@@ -2445,13 +2446,13 @@ public class Grafica {
                                     emp.setFunctie(empFuncField.getText());
                                     emp.setSalariu(Integer.parseInt(empSalField.getText()));
 
-                                    StoreManager storeMan = new StoreManager();
+                                    StoreManager storeMan = StoreManager.getInstance();
                                     Store store = storeMan.getStoreByCity(empStoreField.getText());
 
                                     emp.setActiv((empActivField.getText().equals("Activ")) ? true : false);
                                     empMan.updateEmployee(emp);
                                     Account account = new Account(0, empUserField.getText(), empPassField.getText(), null, 0, emp.getIdEmp());
-                                    AccountManager accMan = new AccountManager();
+                                    AccountManager accMan = AccountManager.getInstance();
                                     accMan.updateEmployeeAccount(account);
                                 }
                             }
@@ -2528,7 +2529,7 @@ public class Grafica {
                         int a = JOptionPane.showConfirmDialog(f, "Are you sure?", "Exiting", JOptionPane.YES_NO_OPTION);
                         if(a == JOptionPane.YES_OPTION) {
                             Store store = new Store(0, adresa, oras, tel);
-                            StoreManager storeMan = new StoreManager();
+                            StoreManager storeMan = StoreManager.getInstance();
                             storeMan.createStore(store);
                         }
                     }
@@ -2545,7 +2546,7 @@ public class Grafica {
         }
 
         private void editStoreWindow() {
-            StoreManager storeMan = new StoreManager();
+            StoreManager storeMan = StoreManager.getInstance();
             ArrayList<Store> stores = storeMan.getStores();
             JTable table = new JTable();
             DefaultTableModel tableModel;
@@ -2668,7 +2669,7 @@ public class Grafica {
         }
 
         private void newOrderWindow() {
-            ClientManager clientMan = new ClientManager();
+            ClientManager clientMan = ClientManager.getInstance();
             ArrayList<Client> customers = clientMan.getAllClients();
             JTable table = new JTable();
             DefaultTableModel tableModel;
@@ -2742,19 +2743,19 @@ public class Grafica {
                                 JOptionPane.showMessageDialog(dialog, "Introduceti ID-ul produsului", "Warning", JOptionPane.WARNING_MESSAGE);
                             } else {
                                 String cat = categorieBox.getSelectedItem().toString();
-                                StockManager stockMan = new StockManager();
-                                StoreManager storeMan = new StoreManager();
+                                StockManager stockMan = StockManager.getInstance();
+                                StoreManager storeMan = StoreManager.getInstance();
                                 Store store = storeMan.getStoreByEmployee(employee);
                                 switch (cat) {
                                     case "Filme":
-                                        MovieManager movieMan = new MovieManager();
+                                        MovieManager movieMan = MovieManager.getInstance();
                                         Movie movie = movieMan.getMovieById(Integer.parseInt(idField.getText()));
                                         if (movie != null) {
                                             int nrFilme = stockMan.checkMovieStock(movie, store);
                                             if (nrFilme > 0) {
-                                                OrderManager orderMan = new OrderManager();
+                                                OrderManager orderMan = OrderManager.getInstance();
 
-                                                ClientManager clientMan = new ClientManager();
+                                                ClientManager clientMan = ClientManager.getInstance();
                                                 Client client = clientMan.getClientById(Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 0))));
 
                                                 if (client != null) {
@@ -2776,14 +2777,14 @@ public class Grafica {
                                         break;
 
                                     case "Jocuri":
-                                        GameManager gameMan = new GameManager();
+                                        GameManager gameMan = GameManager.getInstance();
                                         Game game = gameMan.getGameById(Integer.parseInt(idField.getText()));
                                         if (game != null) {
                                             int nrJocuri = stockMan.checkGameStock(game, store);
                                             if (nrJocuri > 0) {
-                                                OrderManager orderMan = new OrderManager();
+                                                OrderManager orderMan = OrderManager.getInstance();
 
-                                                ClientManager clientMan = new ClientManager();
+                                                ClientManager clientMan = ClientManager.getInstance();
                                                 Client client = clientMan.getClientById(Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 0))));
 
                                                 if (client != null) {
@@ -2804,14 +2805,14 @@ public class Grafica {
                                         }
                                         break;
                                     case "Albume":
-                                        AlbumManager albumManager = new AlbumManager();
+                                        AlbumManager albumManager = AlbumManager.getInstance();
                                         Album album = albumManager.getAlbumById(Integer.parseInt(idField.getText()));
                                         if (album != null) {
                                             int nrAlbume = stockMan.checkAlbumStock(album, store);
                                             if (nrAlbume > 0) {
-                                                OrderManager orderMan = new OrderManager();
+                                                OrderManager orderMan = OrderManager.getInstance();
 
-                                                ClientManager clientMan = new ClientManager();
+                                                ClientManager clientMan = ClientManager.getInstance();
                                                 Client client = clientMan.getClientById(Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 0))));
 
                                                 if (client != null) {
@@ -2857,8 +2858,8 @@ public class Grafica {
         }
 
         private void finishOrderWindow() {
-            OrderManager orderMan = new OrderManager();
-            StoreManager storeMan = new StoreManager();
+            OrderManager orderMan = OrderManager.getInstance();
+            StoreManager storeMan = StoreManager.getInstance();
             Store store = storeMan.getStoreByCity(employee.getOras());
             ArrayList<Order> orders = orderMan.getStoreActiveOrders(store);
             JTable table = new JTable();
@@ -2920,12 +2921,12 @@ public class Grafica {
                         }
                         int rez = orderMan.checkInOrder(order.getStock(), order.getClient(), order.getBorrowDate());
                         if (rez <= 7) {
-                            ClientManager clientMan = new ClientManager();
+                            ClientManager clientMan = ClientManager.getInstance();
                             clientMan.rewardClient(order.getClient());
                             JFrame dialog = new JFrame();
                             JOptionPane.showMessageDialog(dialog, "Clientul a adus produsul la timp!");
                         } else {
-                            ClientManager clientMan = new ClientManager();
+                            ClientManager clientMan = ClientManager.getInstance();
                             clientMan.punishClient(order.getClient());
                             JFrame dialog = new JFrame();
                             JOptionPane.showMessageDialog(dialog, "Atentie! Clientul nu a adus produsul la timp!", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -2944,14 +2945,14 @@ public class Grafica {
         }
 
         private void viewAllOrdersWindow() {
-            OrderManager orderMan = new OrderManager();
+            OrderManager orderMan = OrderManager.getInstance();
             ArrayList<Order> orders = new ArrayList<>();
             String[] columns = new String[]{};
             if (priv == 1) {
                 orders = orderMan.getAllClientOrders(client);
                 columns = new String[]{"Nume", "Prenume", "ID produs", "Data imprumutului", "Data returnarii", "Pret"};
             } else if (priv == 2 || priv == 3) {
-                StoreManager storeMan = new StoreManager();
+                StoreManager storeMan = StoreManager.getInstance();
                 orders = orderMan.getAllStoreOrders(storeMan.getStoreById(employee.getIdMag()));
                 columns = new String[]{"Nume", "Prenume", "CNP", "ID produs", "Data imprumutului", "Data returnarii", "Pret"};
             }
@@ -3137,7 +3138,7 @@ public class Grafica {
             String[] columns = new String[]{"ID", "Titlu", "Actor principal", "Director", "Durata", "Gen", "An", "Audienta", "Pret"};
             mainTableModel.setColumnIdentifiers(columns);
 
-            MovieManager movieMan = new MovieManager();
+            MovieManager movieMan = MovieManager.getInstance();
 
             for (int i = 0; i < contents.size(); i++) {
                 Stock stock = contents.get(i);
@@ -3154,6 +3155,13 @@ public class Grafica {
 
         private DefaultTableModel updateList(String gen, ArrayList<Stock> contents, String cat) {
 
+            System.out.println(gen);
+            System.out.println(cat);
+            Iterator iter = contents.iterator();
+            while (iter.hasNext()) {
+                Stock stock = (Stock) iter.next();
+                System.out.println(stock.getIdProduct());
+            }
             DefaultTableModel model = new DefaultTableModel() {
                 public boolean isCellEditable(int row, int column) {
                     return false;
@@ -3166,7 +3174,7 @@ public class Grafica {
                 columns = new String[]{"ID", "Titlu", "Actor principal", "Director", "Durata", "Gen", "An", "Audienta", "Pret"};
                 model.setColumnIdentifiers(columns);
 
-                MovieManager movieMan = new MovieManager();
+                MovieManager movieMan = MovieManager.getInstance();
 
                 for (int i = 0; i < contents.size(); i++) {
                     Stock stock = contents.get(i);
@@ -3183,16 +3191,20 @@ public class Grafica {
                 columns = new String[]{"ID", "Titlu", "Platforma", "Developer", "Publisher", "Gen", "An", "Audienta", "Pret"};
                 model.setColumnIdentifiers(columns);
 
-                GameManager gameMan = new GameManager();
+                GameManager gameMan = GameManager.getInstance();
 
                 for (int i = 0; i < contents.size(); i++) {
                     Stock stock = contents.get(i);
                     Game game = stock.getGame();
                     int price = stock.getPrice();
 
+                    System.out.println("aici se testeaza");
+                    System.out.println(game == null);
+
                     if (gen.equals("Toate")) {
                         model.addRow(gameMan.gameToRow(game, price));
                     } else if (game.getGenre().equals(gen)) {
+                        System.out.println("aici");
                         model.addRow(gameMan.gameToRow(game, price));
                     }
                 }
@@ -3200,7 +3212,7 @@ public class Grafica {
                 columns = new String[]{"ID", "Trupa", "Titlu", "Casa discuri", "Nr. Melodii", "Gen", "An", "Pret"};
                 model.setColumnIdentifiers(columns);
 
-                AlbumManager albumMan = new AlbumManager();
+                AlbumManager albumMan = AlbumManager.getInstance();
 
                 for (int i = 0; i < contents.size(); i++) {
                     Stock stock = contents.get(i);
@@ -3217,7 +3229,7 @@ public class Grafica {
                 columns = new String[]{"ID", "Nume", "Durata"};
                 model.setColumnIdentifiers(columns);
 
-                SongManager songMan = new SongManager();
+                SongManager songMan = SongManager.getInstance();
 
                 for (int i = 0; i < contents.size(); i++) {
                     Stock stock = contents.get(i);
@@ -3245,15 +3257,15 @@ public class Grafica {
 
             switch (gen) {
                 case "Filme":
-                    MovieManager movieMan = new MovieManager();
+                    MovieManager movieMan = MovieManager.getInstance();
                     mainCategoriesList = movieMan.getGenres();
                     break;
                 case "Jocuri":
-                    GameManager gameMan = new GameManager();
+                    GameManager gameMan = GameManager.getInstance();
                     mainCategoriesList = gameMan.getGenres();
                     break;
                 case "Albume":
-                    AlbumManager albumManager = new AlbumManager();
+                    AlbumManager albumManager = AlbumManager.getInstance();
                     mainCategoriesList = albumManager.getGenres();
             }
 
@@ -3278,3 +3290,4 @@ public class Grafica {
         GUI interfata = new GUI();
     }
 }
+

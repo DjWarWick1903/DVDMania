@@ -7,13 +7,26 @@ import java.sql.*;
 import java.util.ArrayList;
 
 public class ConnectionManager {
+
+    private static ConnectionManager instance = null;
+
+    private ConnectionManager() {
+    }
+
+    public static ConnectionManager getInstance() {
+        if (instance == null) {
+            instance = new ConnectionManager();
+        }
+
+        return instance;
+    }
+
     public Connection openConnection() throws SQLException {
         Connection myConn = null;
         String[] array = readFromFile();
 
         if (array[0] != null && array[1] != null && array[2] != null) {
             myConn = DriverManager.getConnection(array[0], array[1], array[2]);
-            //myConn = DriverManager.getConnection("jdbc:mysql://localhost:3306/dvdmania", "root", "robertmaster1");
         }
 
         return myConn;

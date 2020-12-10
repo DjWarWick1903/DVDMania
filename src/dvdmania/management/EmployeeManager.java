@@ -8,7 +8,19 @@ import java.util.ArrayList;
 
 public class EmployeeManager {
 
-    ConnectionManager connMan = new ConnectionManager();
+    ConnectionManager connMan = ConnectionManager.getInstance();
+    private static EmployeeManager instance = null;
+
+    private EmployeeManager() {
+    }
+
+    public static EmployeeManager getInstance() {
+        if (instance == null) {
+            instance = new EmployeeManager();
+        }
+
+        return instance;
+    }
 
     public int createEmployee(Employee employee) {
         Connection connection = null;
@@ -127,7 +139,7 @@ public class EmployeeManager {
                 int idMag = result.getInt("id_mag");
 
                 emp = new Employee(id, nume, prenume, adresa, oras, datan, cnp, telefon, email, functie, salariu, true, idMag);
-                AccountManager accMan = new AccountManager();
+                AccountManager accMan = AccountManager.getInstance();
                 Account account = accMan.getEmployeeAccount(emp);
                 emp.setAccount(account);
             }
@@ -173,7 +185,7 @@ public class EmployeeManager {
                 int idMag = result.getInt("id_mag");
                 Employee employee = new Employee(idEmp, nume, prenume, adresa, oras, datan, cnp, telefon, email, functie, salariu, true, idMag);
 
-                AccountManager accMan = new AccountManager();
+                AccountManager accMan = AccountManager.getInstance();
                 Account account = accMan.getEmployeeAccount(employee);
                 employee.setAccount(account);
 
@@ -263,7 +275,7 @@ public class EmployeeManager {
         row[8] = employee.getEmail();
         row[9] = employee.getFunctie();
         row[10] = employee.getSalariu() + "";
-        StoreManager storeMan = new StoreManager();
+        StoreManager storeMan = StoreManager.getInstance();
         Store store = storeMan.getStoreById(employee.getIdMag());
         row[11] = store.getOras();
         row[12] = employee.getAccount().getUsername();
