@@ -237,16 +237,6 @@ public class StockManager {
             }
         }
 
-        Iterator iter = stockList.iterator();
-        while (iter.hasNext()) {
-            Stock stock = (Stock) iter.next();
-
-            GameManager gameMan = GameManager.getInstance();
-            stock.setGame(gameMan.getGameById(stock.getGame().getIdGame()));
-            StoreManager storeMan = StoreManager.getInstance();
-            stock.setStore(storeMan.getStoreById(stock.getStore().getId()));
-        }
-
         return stockList;
     }
 

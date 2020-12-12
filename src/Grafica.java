@@ -18,9 +18,9 @@ public class Grafica {
         // constructorul interfetei grafice
         GUI() {
             super("Login");
+            MainPanel();
             LoginPanel();
             NewAccountPanel();
-            MainPanel();
         }
 
         // variabilele ce tin cont de privilegiile utilizatorului curent
@@ -38,6 +38,7 @@ public class Grafica {
         static Client client = null;
         static String categorieCurenta;
         static String magazinCurent;
+        static boolean canModify = true;
 
         //componentele ferestrei de login
         static int[] loginSize = {350, 280};
@@ -670,11 +671,13 @@ public class Grafica {
             mainCategoryBox.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    try {
-                        String selectedGen = mainCategoryBox.getSelectedItem().toString();
-                        mainProdTable.setModel(updateList(selectedGen, mainProduseList, categorieCurenta));
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
+                    if (canModify) {
+                        try {
+                            String selectedGen = mainCategoryBox.getSelectedItem().toString();
+                            mainProdTable.setModel(updateList(selectedGen, mainProduseList, categorieCurenta));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
                     }
                 }
             });
@@ -682,39 +685,41 @@ public class Grafica {
             mainStoreBox.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    try {
-                        StoreManager storeMan = StoreManager.getInstance();
-                        StockManager stockMan = StockManager.getInstance();
+                    if (canModify) {
+                        try {
+                            StoreManager storeMan = StoreManager.getInstance();
+                            StockManager stockMan = StockManager.getInstance();
 
-                        String selectedStore = mainStoreBox.getSelectedItem().toString();
-                        switch (categorieCurenta) {
-                            case "Filme":
-                                if (!selectedStore.equals("Toate")) {
-                                    Store store = storeMan.getStoreByCity(selectedStore);
-                                    mainProduseList = stockMan.getAllMovieStock(store);
-                                } else {
-                                    mainProduseList = stockMan.getAllMovieStock();
-                                }
-                                break;
-                            case "Jocuri":
-                                if (!selectedStore.equals("Toate")) {
-                                    Store store = storeMan.getStoreByCity(selectedStore);
-                                    mainProduseList = stockMan.getAllGameStock(store);
-                                } else {
-                                    mainProduseList = stockMan.getAllGameStock();
-                                }
-                                break;
-                            case "Albume":
-                                if (!selectedStore.equals("Toate")) {
-                                    Store store = storeMan.getStoreByCity(selectedStore);
-                                    mainProduseList = stockMan.getAllAlbumStock(store);
-                                } else {
-                                    mainProduseList = stockMan.getAllAlbumStock();
-                                }
+                            String selectedStore = mainStoreBox.getSelectedItem().toString();
+                            switch (categorieCurenta) {
+                                case "Filme":
+                                    if (!selectedStore.equals("Toate")) {
+                                        Store store = storeMan.getStoreByCity(selectedStore);
+                                        mainProduseList = stockMan.getAllMovieStock(store);
+                                    } else {
+                                        mainProduseList = stockMan.getAllMovieStock();
+                                    }
+                                    break;
+                                case "Jocuri":
+                                    if (!selectedStore.equals("Toate")) {
+                                        Store store = storeMan.getStoreByCity(selectedStore);
+                                        mainProduseList = stockMan.getAllGameStock(store);
+                                    } else {
+                                        mainProduseList = stockMan.getAllGameStock();
+                                    }
+                                    break;
+                                case "Albume":
+                                    if (!selectedStore.equals("Toate")) {
+                                        Store store = storeMan.getStoreByCity(selectedStore);
+                                        mainProduseList = stockMan.getAllAlbumStock(store);
+                                    } else {
+                                        mainProduseList = stockMan.getAllAlbumStock();
+                                    }
+                            }
+                            mainProdTable.setModel(updateList(mainCategoryBox.getSelectedItem().toString(), mainProduseList, categorieCurenta));
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
                         }
-                        mainProdTable.setModel(updateList(mainCategoryBox.getSelectedItem().toString(), mainProduseList, categorieCurenta));
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
                     }
                 }
             });
@@ -722,40 +727,48 @@ public class Grafica {
             mainFilmeButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    categorieCurenta = "Filme";
-                    updateComboBox("Filme");
-                    mainCategoryBox.setSelectedItem("Toate");
-                    mainStoreBox.setSelectedItem("Toate");
-                    StockManager stockMan = StockManager.getInstance();
-                    mainProduseList = stockMan.getAllMovieStock();
-                    mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
+                    if (!categorieCurenta.equals("Filme")) {
+                        canModify = false;
+                        categorieCurenta = "Filme";
+                        updateComboBox("Filme");
+                        mainCategoryBox.setSelectedItem("Toate");
+                        mainStoreBox.setSelectedItem("Toate");
+                        StockManager stockMan = StockManager.getInstance();
+                        mainProduseList = stockMan.getAllMovieStock();
+                        mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
+                    }
                 }
             });
 
             mainJocuriButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    categorieCurenta = "Jocuri";
-                    updateComboBox("Jocuri");
-                    mainCategoryBox.setSelectedItem("Toate");
-                    mainStoreBox.setSelectedItem("Toate");
-                    StockManager stockMan = StockManager.getInstance();
-                    mainProduseList = stockMan.getAllGameStock();
-                    System.out.println("action listener");
-                    mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
+                    if (!categorieCurenta.equals("Jocuri")) {
+                        canModify = false;
+                        categorieCurenta = "Jocuri";
+                        updateComboBox(categorieCurenta);
+                        mainCategoryBox.setSelectedItem("Toate");
+                        mainStoreBox.setSelectedItem("Toate");
+                        StockManager stockMan = StockManager.getInstance();
+                        mainProduseList = stockMan.getAllGameStock();
+                        mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
+                    }
                 }
             });
 
             mainAlbumeButton.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    categorieCurenta = "Albume";
-                    updateComboBox("Albume");
-                    mainCategoryBox.setSelectedItem("Toate");
-                    mainStoreBox.setSelectedItem("Toate");
-                    StockManager stockMan = StockManager.getInstance();
-                    mainProduseList = stockMan.getAllAlbumStock();
-                    mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
+                    if (!categorieCurenta.equals("Albume")) {
+                        canModify = false;
+                        categorieCurenta = "Albume";
+                        updateComboBox("Albume");
+                        mainCategoryBox.setSelectedItem("Toate");
+                        mainStoreBox.setSelectedItem("Toate");
+                        StockManager stockMan = StockManager.getInstance();
+                        mainProduseList = stockMan.getAllAlbumStock();
+                        mainProdTable.setModel(updateList("Toate", mainProduseList, categorieCurenta));
+                    }
                 }
             });
 
@@ -3155,12 +3168,9 @@ public class Grafica {
 
         private DefaultTableModel updateList(String gen, ArrayList<Stock> contents, String cat) {
 
-            System.out.println(gen);
-            System.out.println(cat);
             Iterator iter = contents.iterator();
             while (iter.hasNext()) {
                 Stock stock = (Stock) iter.next();
-                System.out.println(stock.getIdProduct());
             }
             DefaultTableModel model = new DefaultTableModel() {
                 public boolean isCellEditable(int row, int column) {
@@ -3198,13 +3208,9 @@ public class Grafica {
                     Game game = stock.getGame();
                     int price = stock.getPrice();
 
-                    System.out.println("aici se testeaza");
-                    System.out.println(game == null);
-
                     if (gen.equals("Toate")) {
                         model.addRow(gameMan.gameToRow(game, price));
                     } else if (game.getGenre().equals(gen)) {
-                        System.out.println("aici");
                         model.addRow(gameMan.gameToRow(game, price));
                     }
                 }
