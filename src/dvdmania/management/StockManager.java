@@ -7,6 +7,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+//TODO: create getAllStock and getAllStock(Store) methods
+
 public class StockManager {
 
     ConnectionManager connMan = ConnectionManager.getInstance();
@@ -22,6 +24,10 @@ public class StockManager {
 
         return instance;
     }
+
+//    public ArrayList<Stock> getAllStock() {
+//
+//    }
 
     public Stock getStockById(int id) {
         Connection connection = null;

@@ -399,4 +399,108 @@ public class OrderManager {
 
         return row;
     }
+
+    public ArrayList<Order> getOrdersByDates(LocalDate date1, LocalDate date2, Store oras) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        ArrayList<Order> orderList = new ArrayList<>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, id_cl, id_angaj, id_mag, data_imp, data_ret, pret FROM dvdmania.imprumuturi ";
+
+            if (date1 != null && date2 != null) {
+                if (oras == null) {
+                    sql += "WHERE data_imp > ? AND data_imp < ?";
+                    statement = connection.prepareStatement(sql);
+                    statement.setObject(1, date1);
+                    statement.setObject(2, date2);
+                    result = statement.executeQuery();
+                } else {
+                    sql += "WHERE data_imp > ? AND data_imp < ? AND id_mag = ?";
+                    statement = connection.prepareStatement(sql);
+                    statement.setObject(1, date1);
+                    statement.setObject(2, date2);
+                    statement.setInt(3, oras.getId());
+                    result = statement.executeQuery();
+                }
+            } else if (date1 == null && date2 == null) {
+                if (oras != null) {
+                    sql += "WHERE id_mag = ?";
+                    statement = connection.prepareStatement(sql);
+                    statement.setInt(1, oras.getId());
+                    result = statement.executeQuery();
+                } else {
+                    statement = connection.prepareStatement(sql);
+                    result = statement.executeQuery();
+                }
+            } else if (date1 == null) {
+                if (oras == null) {
+                    sql += "WHERE data_imp > ?";
+                    statement = connection.prepareStatement(sql);
+                    statement.setObject(1, date1);
+                    result = statement.executeQuery();
+                } else {
+                    sql += "WHERE data_imp > ? AND id_mag = ?";
+                    statement = connection.prepareStatement(sql);
+                    statement.setObject(1, date1);
+                    statement.setInt(2, oras.getId());
+                    result = statement.executeQuery();
+                }
+            } else if (date2 == null) {
+                if (oras == null) {
+                    sql += "WHERE data_imp < ?";
+                    statement = connection.prepareStatement(sql);
+                    statement.setObject(1, date1);
+                    result = statement.executeQuery();
+                } else {
+                    sql += "WHERE data_imp < ? AND id_mag = ?";
+                    statement = connection.prepareStatement(sql);
+                    statement.setObject(1, date1);
+                    statement.setInt(2, oras.getId());
+                    result = statement.executeQuery();
+                }
+            }
+
+            StockManager stockMan = StockManager.getInstance();
+            ClientManager clientMan = ClientManager.getInstance();
+            EmployeeManager empMan = EmployeeManager.getInstance();
+
+            while (result.next()) {
+                int idStock = result.getInt("id_prod");
+                int idClient = result.getInt("id_cl");
+                int idEmp = result.getInt("id_angaj");
+                LocalDate date = result.getDate("data_imp").toLocalDate();
+                LocalDate retDate = (result.getDate("data_ret") == null) ? null : result.getDate("data_ret").toLocalDate();
+                int price = result.getInt("pret");
+
+                Store store;
+
+                if (oras == null) {
+                    int storeId = result.getInt("id_mag");
+                    store = StoreManager.getInstance().getStoreById(storeId);
+                } else {
+                    store = oras;
+                }
+
+                Stock stock = stockMan.getStockById(idStock);
+                Client client = clientMan.getClientById(idClient);
+                Employee emp = empMan.getEmployeeById(idEmp);
+
+                Order order = new Order(stock, client, emp, store, date, retDate, price);
+                orderList.add(order);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return orderList;
+    }
 }
