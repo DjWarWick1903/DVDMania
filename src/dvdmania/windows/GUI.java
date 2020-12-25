@@ -71,7 +71,7 @@ public class GUI extends JFrame {
     //componentele meniului din fereastra principala
     static JMenu fileMenu, editMenu, viewMenu;
     static JMenuItem newOrder, finishOrder, logout, exit, newCustomer, newEmployee, newProduct, newStore, editCustomer, editEmployee, editProduct, editStore,
-            viewAllOrders, viewAccountDetails, exportOrders;
+            viewAllOrders, viewAccountDetails, viewOrdersChart, viewProductChart, exportOrders, exportStock;
     static JMenuBar mb;
 
     //componentele ferestrei principale
@@ -379,6 +379,7 @@ public class GUI extends JFrame {
         finishOrder = new JMenuItem("Return order");
         logout = new JMenuItem("Logout");
         exportOrders = new JMenuItem("Export order");
+        exportStock = new JMenuItem("Export stock");
         exit = new JMenuItem("Exit");
 
         //Edit menu items
@@ -394,11 +395,14 @@ public class GUI extends JFrame {
         //View menu items
         viewAllOrders = new JMenuItem("View all orders");
         viewAccountDetails = new JMenuItem("View account details");
+        viewOrdersChart = new JMenuItem("Order chart");
+        viewProductChart = new JMenuItem("Product chart");
 
         //Assign menus
         fileMenu.add(newOrder);
         fileMenu.add(finishOrder);
         fileMenu.add(exportOrders);
+        fileMenu.add(exportStock);
         fileMenu.addSeparator();
         fileMenu.add(logout);
         fileMenu.add(exit);
@@ -415,6 +419,8 @@ public class GUI extends JFrame {
         editMenu.add(editStore);
         viewMenu.add(viewAllOrders);
         viewMenu.add(viewAccountDetails);
+        viewMenu.add(viewOrdersChart);
+        viewMenu.add(viewProductChart);
 
         //Assign menu bar
         mb.add(fileMenu);
@@ -449,7 +455,7 @@ public class GUI extends JFrame {
                     JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    newProductWindow();
+                    NewProductWindow.getInstance();
                 }
             }
         });
@@ -466,6 +472,18 @@ public class GUI extends JFrame {
             }
         });
 
+        exportStock.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (priv == 0 || priv == 1) {
+                    JFrame dialog = new JFrame();
+                    JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    ExportStockWindow stockWindow = ExportStockWindow.getInstance();
+                }
+            }
+        });
+
         editProduct.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -473,7 +491,7 @@ public class GUI extends JFrame {
                     JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    editProductWindow();
+                    EditProductWindow.getInstance();
                 }
             }
         });
@@ -485,7 +503,7 @@ public class GUI extends JFrame {
                     JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    newCustomerWindow();
+                    NewCustomerWindow.getInstance();
                 }
             }
         });
@@ -497,7 +515,7 @@ public class GUI extends JFrame {
                     JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    editCustomerWindow();
+                    EditCustomerWindow.getInstance();
                 }
             }
         });
@@ -590,6 +608,30 @@ public class GUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 viewAccountWindow();
+            }
+        });
+
+        viewOrdersChart.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (priv == 0 || priv == 1) {
+                    JFrame dialog = new JFrame();
+                    JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    SaleChartWindow.getInstance();
+                }
+            }
+        });
+
+        viewProductChart.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (priv == 0 || priv == 1) {
+                    JFrame dialog = new JFrame();
+                    JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    ProductChartWindow.getInstance();
+                }
             }
         });
 
@@ -946,1191 +988,11 @@ public class GUI extends JFrame {
         });
     }
 
+    protected static Employee getLoggedEmployee() {
+        return employee;
+    }
+
     //**Menu Windows**
-
-    private void newProductWindow() {
-        JFrame newProdWindow = new JFrame();
-        newProdWindow.setTitle("Produs nou");
-
-        //creare butoane
-        JButton newFilm = new JButton("Film");
-        JButton newJoc = new JButton("Joc");
-        JButton newAlbum = new JButton("Album");
-        JButton newSong = new JButton("Melodie");
-        JButton exit = new JButton("Exit");
-
-        //creare fereastra principala
-        JPanel newProductButtons = new JPanel(new GridLayout(2,2,2,2));
-        newProductButtons.add(newFilm);
-        newProductButtons.add(newJoc);
-        newProductButtons.add(newAlbum);
-        newProductButtons.add(newSong);
-
-        JPanel newProductMain = new JPanel(new BorderLayout());
-        newProductMain.add(newProductButtons, BorderLayout.CENTER);
-        newProductMain.add(exit, BorderLayout.SOUTH);
-
-        newProdWindow.setVisible(true);
-        newProdWindow.add(newProductMain);
-        newProdWindow.setSize(300,300);
-        newProdWindow.setLocationRelativeTo(null);
-
-        //creare fereastra filme
-        newFilm.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTextField newFilmTitluField, newFilmActorField, newFilmDirectorField, newFilmDurataField, newFilmGenField, newFilmAnField, newFilmAudientaField, newFilmCantField, newFilmPretField;
-                JLabel newFilmTitluLabel, newFilmActorLabel, newFilmDirectorLabel, newFilmDurataLabel, newFilmGenLabel, newFilmAnLabel, newFilmAudientaLabel, newFilmCantLabel, newFilmPretLabel;
-                JButton save, exit;
-
-                newFilmTitluLabel = new JLabel("Titlu:");
-                newFilmTitluField = new JTextField();
-                newFilmActorLabel = new JLabel("Actor principal:");
-                newFilmActorField = new JTextField();
-                newFilmDirectorLabel = new JLabel("Director:");
-                newFilmDirectorField = new JTextField();
-                newFilmDurataLabel = new JLabel("Durata:");
-                newFilmDurataField = new JTextField();
-                newFilmGenField = new JTextField();
-                newFilmGenLabel = new JLabel("Gen:");
-                newFilmAnLabel = new JLabel("An:");
-                newFilmAnField = new JTextField();
-                newFilmAudientaLabel = new JLabel("Audienta:");
-                newFilmAudientaField = new JTextField();
-                newFilmCantLabel = new JLabel("Cantitate:");
-                newFilmCantField = new JTextField();
-                newFilmPretLabel = new JLabel("Pret:");
-                newFilmPretField = new JTextField();
-                save = new JButton("Save");
-                exit = new JButton("Exit");
-
-                JFrame newFilmWindow = new JFrame();
-                JPanel detaliiPanel = new JPanel(new GridLayout(9,9,5,5));
-                JPanel butoanePanel = new JPanel(new GridLayout(1,2,5,5));
-                JPanel newFilmMain = new JPanel(new BorderLayout());
-                detaliiPanel.add(newFilmTitluLabel);
-                detaliiPanel.add(newFilmTitluField);
-                detaliiPanel.add(newFilmActorLabel);
-                detaliiPanel.add(newFilmActorField);
-                detaliiPanel.add(newFilmDirectorLabel);
-                detaliiPanel.add(newFilmDirectorField);
-                detaliiPanel.add(newFilmDurataLabel);
-                detaliiPanel.add(newFilmDurataField);
-                detaliiPanel.add(newFilmGenLabel);
-                detaliiPanel.add(newFilmGenField);
-                detaliiPanel.add(newFilmAnLabel);
-                detaliiPanel.add(newFilmAnField);
-                detaliiPanel.add(newFilmAudientaLabel);
-                detaliiPanel.add(newFilmAudientaField);
-                detaliiPanel.add(newFilmCantLabel);
-                detaliiPanel.add(newFilmCantField);
-                detaliiPanel.add(newFilmPretLabel);
-                detaliiPanel.add(newFilmPretField);
-                butoanePanel.add(save);
-                butoanePanel.add(exit);
-                newFilmMain.add(detaliiPanel, BorderLayout.CENTER);
-                newFilmMain.add(butoanePanel, BorderLayout.SOUTH);
-
-                newFilmWindow.add(newFilmMain);
-                newFilmWindow.setSize(300,330);
-                newFilmWindow.setVisible(true);
-                newFilmWindow.setLocationRelativeTo(null);
-
-                save.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        String titlu, actor, director, durata, gen, an, audienta, cant, pret;
-                        titlu = newFilmTitluField.getText();
-                        actor = newFilmActorField.getText();
-                        director = newFilmDirectorField.getText();
-                        durata = newFilmDurataField.getText();
-                        gen = newFilmGenField.getText();
-                        an = newFilmAnField.getText();
-                        audienta = newFilmAudientaField.getText();
-                        cant = newFilmCantField.getText();
-                        pret = newFilmPretField.getText();
-
-                        if(titlu.isEmpty() || actor.isEmpty() || director.isEmpty() || durata.isEmpty() || gen.isEmpty() || an.isEmpty() || audienta.isEmpty() || cant.isEmpty() || pret.isEmpty()) {
-                            JFrame dialog = new JFrame();
-                            JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
-                        } else {
-                            MovieManager movieMan = MovieManager.getInstance();
-                            StockManager stockMan = StockManager.getInstance();
-                            StoreManager storeMan = StoreManager.getInstance();
-
-                            Movie movie = new Movie(0, titlu, actor, director, Integer.parseInt(durata), gen, an, Integer.parseInt(audienta));
-                            Store store = storeMan.getStoreByCity(employee.getOras());
-
-                            movieMan.createMovie(movie);
-                            stockMan.insertMovieStock(movie, store, Integer.parseInt(cant), Integer.parseInt(pret));
-                        }
-                    }
-                });
-
-                exit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        newFilmWindow.setVisible(false);
-                        newFilmWindow.dispose();
-                    }
-                });
-            }
-        });
-
-        newJoc.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTextField newJocTitluField, newJocPlatformaField, newJocDeveloperField, newJocPublisherField, newJocGenField, newJocAnField, newJocAudientaField, newJocCantField, newJocPretField;
-                JLabel newJocTitluLabel, newJocPlatformaLabel, newJocDeveloperLabel, newJocPublisherLabel, newJocGenLabel, newJocAnLabel, newJocAudientaLabel, newJocCantLabel, newJocPretLabel;
-                JButton save, exit;
-
-                newJocTitluLabel = new JLabel("Titlu:");
-                newJocTitluField = new JTextField();
-                newJocPlatformaLabel = new JLabel("Platforma:");
-                newJocPlatformaField = new JTextField();
-                newJocDeveloperLabel = new JLabel("Developer:");
-                newJocDeveloperField = new JTextField();
-                newJocPublisherLabel = new JLabel("Publisher:");
-                newJocPublisherField = new JTextField();
-                newJocGenField = new JTextField();
-                newJocGenLabel = new JLabel("Gen:");
-                newJocAnLabel = new JLabel("An:");
-                newJocAnField = new JTextField();
-                newJocAudientaLabel = new JLabel("Audienta:");
-                newJocAudientaField = new JTextField();
-                newJocCantLabel = new JLabel("Cantitate:");
-                newJocCantField = new JTextField();
-                newJocPretLabel = new JLabel("Pret:");
-                newJocPretField = new JTextField();
-                save = new JButton("Save");
-                exit = new JButton("Exit");
-
-                JFrame newJocWindow = new JFrame();
-                JPanel detaliiPanel = new JPanel(new GridLayout(9,9,5,5));
-                JPanel butoanePanel = new JPanel(new GridLayout(1,2,5,5));
-                JPanel newJocMain = new JPanel(new BorderLayout());
-                detaliiPanel.add(newJocTitluLabel);
-                detaliiPanel.add(newJocTitluField);
-                detaliiPanel.add(newJocPlatformaLabel);
-                detaliiPanel.add(newJocPlatformaField);
-                detaliiPanel.add(newJocDeveloperLabel);
-                detaliiPanel.add(newJocDeveloperField);
-                detaliiPanel.add(newJocPublisherLabel);
-                detaliiPanel.add(newJocPublisherField);
-                detaliiPanel.add(newJocGenLabel);
-                detaliiPanel.add(newJocGenField);
-                detaliiPanel.add(newJocAnLabel);
-                detaliiPanel.add(newJocAnField);
-                detaliiPanel.add(newJocAudientaLabel);
-                detaliiPanel.add(newJocAudientaField);
-                detaliiPanel.add(newJocCantLabel);
-                detaliiPanel.add(newJocCantField);
-                detaliiPanel.add(newJocPretLabel);
-                detaliiPanel.add(newJocPretField);
-                butoanePanel.add(save);
-                butoanePanel.add(exit);
-                newJocMain.add(detaliiPanel, BorderLayout.CENTER);
-                newJocMain.add(butoanePanel, BorderLayout.SOUTH);
-
-                newJocWindow.add(newJocMain);
-                newJocWindow.setSize(300,330);
-                newJocWindow.setVisible(true);
-                newJocWindow.setLocationRelativeTo(null);
-
-                save.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        String titlu, platforma, developer, publisher, gen, an, audienta, cant, pret;
-                        titlu = newJocTitluField.getText();
-                        platforma = newJocPlatformaField.getText();
-                        developer = newJocDeveloperField.getText();
-                        publisher = newJocPublisherField.getText();
-                        gen = newJocGenField.getText();
-                        an = newJocAnField.getText();
-                        audienta = newJocAudientaField.getText();
-                        cant = newJocCantField.getText();
-                        pret = newJocPretField.getText();
-
-                        if(titlu.isEmpty() || platforma.isEmpty() || developer.isEmpty() || publisher.isEmpty() || gen.isEmpty() || an.isEmpty() || audienta.isEmpty() || cant.isEmpty() || pret.isEmpty()) {
-                            JFrame dialog = new JFrame();
-                            JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
-                        } else {
-                            GameManager gameMan = GameManager.getInstance();
-                            StockManager stockMan = StockManager.getInstance();
-                            StoreManager storeMan = StoreManager.getInstance();
-
-                            Game game = new Game(0, titlu, an, platforma, developer, publisher, gen, Integer.parseInt(audienta));
-                            Store store = storeMan.getStoreByCity(employee.getOras());
-
-                            gameMan.createGame(game);
-                            stockMan.insertGameStock(game, store, Integer.parseInt(cant), Integer.parseInt(pret));
-                        }
-                    }
-                });
-
-                exit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        newJocWindow.setVisible(false);
-                        newJocWindow.dispose();
-                    }
-                });
-            }
-        });
-
-        newAlbum.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTextField newAlbumTitluField, newAlbumTrupaField, newAlbumMelodiiField, newAlbumCasaDiscuriField, newAlbumGenField, newAlbumAnField, newAlbumCantField, newAlbumPretField;
-                JLabel newAlbumTitluLabel, newAlbumTrupaLabel, newAlbumMelodiiLabel, newAlbumCasaDiscuriLabel, newAlbumGenLabel, newAlbumAnLabel, newAlbumCantLabel, newAlbumPretLabel;
-                JButton save, exit;
-
-                newAlbumTitluLabel = new JLabel("Titlu:");
-                newAlbumTitluField = new JTextField();
-                newAlbumTrupaLabel = new JLabel("Trupa:");
-                newAlbumTrupaField = new JTextField();
-                newAlbumMelodiiLabel = new JLabel("Numar melodii:");
-                newAlbumMelodiiField = new JTextField();
-                newAlbumCasaDiscuriLabel = new JLabel("Casa discuri:");
-                newAlbumCasaDiscuriField = new JTextField();
-                newAlbumGenField = new JTextField();
-                newAlbumGenLabel = new JLabel("Gen:");
-                newAlbumAnLabel = new JLabel("An:");
-                newAlbumAnField = new JTextField();
-                newAlbumCantLabel = new JLabel("Cantitate:");
-                newAlbumCantField = new JTextField();
-                newAlbumPretLabel = new JLabel("Pret:");
-                newAlbumPretField = new JTextField();
-                save = new JButton("Save");
-                exit = new JButton("Exit");
-
-                JFrame newAlbumWindow = new JFrame();
-                JPanel detaliiPanel = new JPanel(new GridLayout(8,8,5,5));
-                JPanel butoanePanel = new JPanel(new GridLayout(1,2,5,5));
-                JPanel newAlbumMain = new JPanel(new BorderLayout());
-                detaliiPanel.add(newAlbumTitluLabel);
-                detaliiPanel.add(newAlbumTitluField);
-                detaliiPanel.add(newAlbumTrupaLabel);
-                detaliiPanel.add(newAlbumTrupaField);
-                detaliiPanel.add(newAlbumMelodiiLabel);
-                detaliiPanel.add(newAlbumMelodiiField);
-                detaliiPanel.add(newAlbumCasaDiscuriLabel);
-                detaliiPanel.add(newAlbumCasaDiscuriField);
-                detaliiPanel.add(newAlbumGenLabel);
-                detaliiPanel.add(newAlbumGenField);
-                detaliiPanel.add(newAlbumAnLabel);
-                detaliiPanel.add(newAlbumAnField);
-                detaliiPanel.add(newAlbumCantLabel);
-                detaliiPanel.add(newAlbumCantField);
-                detaliiPanel.add(newAlbumPretLabel);
-                detaliiPanel.add(newAlbumPretField);
-                butoanePanel.add(save);
-                butoanePanel.add(exit);
-                newAlbumMain.add(detaliiPanel, BorderLayout.CENTER);
-                newAlbumMain.add(butoanePanel, BorderLayout.SOUTH);
-
-                newAlbumWindow.add(newAlbumMain);
-                newAlbumWindow.setSize(300,330);
-                newAlbumWindow.setVisible(true);
-                newAlbumWindow.setLocationRelativeTo(null);
-
-                save.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        String titlu, trupa, melodii, casaDisc, gen, an, cant, pret;
-                        titlu = newAlbumTitluField.getText();
-                        trupa = newAlbumTrupaField.getText();
-                        melodii = newAlbumMelodiiField.getText();
-                        casaDisc = newAlbumCasaDiscuriField.getText();
-                        gen = newAlbumGenField.getText();
-                        an = newAlbumAnField.getText();
-                        cant = newAlbumCantField.getText();
-                        pret = newAlbumPretField.getText();
-
-                        if(titlu.isEmpty() || trupa.isEmpty() || melodii.isEmpty() || casaDisc.isEmpty() || gen.isEmpty() || an.isEmpty() || cant.isEmpty() || pret.isEmpty()) {
-                            JFrame dialog = new JFrame();
-                            JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
-                        } else {
-                            AlbumManager albumMan = AlbumManager.getInstance();
-                            StockManager stockMan = StockManager.getInstance();
-                            StoreManager storeMan = StoreManager.getInstance();
-
-                            Album album = new Album(0, titlu, trupa, Integer.parseInt(melodii), casaDisc, gen, an);
-                            Store store = storeMan.getStoreByCity(employee.getOras());
-
-                            albumMan.createAlbum(album);
-                            stockMan.insertAlbumStock(album, store, Integer.parseInt(cant), Integer.parseInt(pret));
-                        }
-                    }
-                });
-
-                exit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        newAlbumWindow.setVisible(false);
-                        newAlbumWindow.dispose();
-                    }
-                });
-            }
-        });
-
-        newSong.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JTextField newSongNumeField, newSongDurataField;
-                JLabel newSongNumeLabel, newSongDurataLabel, newSongAlbumLabel;
-                JComboBox newSongAlbumBox;
-                JButton save, exit;
-
-                newSongNumeLabel = new JLabel("Nume:");
-                newSongNumeField = new JTextField();
-                newSongDurataLabel = new JLabel("Durata:");
-                newSongDurataField = new JTextField();
-                newSongAlbumLabel = new JLabel("Album");
-                AlbumManager albumMan = AlbumManager.getInstance();
-                ArrayList<Album> albume = albumMan.getAllAlbums();
-                ArrayList<String> numeAlbume = new ArrayList<>();
-                Iterator iterator = albume.iterator();
-                while (iterator.hasNext()) {
-                    Album album = (Album) iterator.next();
-                    numeAlbume.add(album.getTitle());
-                }
-                newSongAlbumBox = new JComboBox(numeAlbume.toArray());
-                save = new JButton("Save");
-                exit = new JButton("Exit");
-
-                JFrame newSongWindow = new JFrame();
-                JPanel detaliiPanel = new JPanel(new GridLayout(3, 3, 5, 5));
-                JPanel butoanePanel = new JPanel(new GridLayout(1, 2, 5, 5));
-                JPanel newSongMain = new JPanel(new BorderLayout());
-                detaliiPanel.add(newSongAlbumLabel);
-                detaliiPanel.add(newSongAlbumBox);
-                detaliiPanel.add(newSongNumeLabel);
-                detaliiPanel.add(newSongNumeField);
-                detaliiPanel.add(newSongDurataLabel);
-                detaliiPanel.add(newSongDurataField);
-                butoanePanel.add(save);
-                butoanePanel.add(exit);
-                newSongMain.add(detaliiPanel, BorderLayout.CENTER);
-                newSongMain.add(butoanePanel, BorderLayout.SOUTH);
-
-                newSongWindow.add(newSongMain);
-                newSongWindow.setSize(300,330);
-                newSongWindow.setVisible(true);
-                newSongWindow.setLocationRelativeTo(null);
-
-                save.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        String albumName, nume, durata;
-                        albumName = String.valueOf(newSongAlbumBox.getSelectedItem());
-                        nume = newSongNumeField.getText();
-                        durata = newSongDurataField.getText();
-
-                        if (nume.isEmpty() || durata.isEmpty()) {
-                            JFrame dialog = new JFrame();
-                            JOptionPane.showMessageDialog(dialog, "Toate campurile trebuie completate!", "Warning", JOptionPane.WARNING_MESSAGE);
-                        } else {
-                            SongManager songMan = SongManager.getInstance();
-                            Iterator iterator = albume.iterator();
-                            while (iterator.hasNext()) {
-                                Album album = (Album) iterator.next();
-                                if (album.getTitle().equals(albumName)) {
-                                    Song song = new Song(0, nume, Integer.parseInt(durata));
-                                    songMan.CreateSong(album, song);
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                });
-
-                exit.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        newSongWindow.setVisible(false);
-                        newSongWindow.dispose();
-                    }
-                });
-            }
-        });
-
-        exit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                newProdWindow.setVisible(false);
-                newProdWindow.dispose();
-            }
-        });
-    }
-
-    private void editProductWindow() {
-        //first window
-        JLabel editCategorieLabel, editIDLabel;
-        JComboBox editCategorieBox;
-        JTextField editIDField;
-        JButton exit, proceed, saveSecond, exitSecond;
-        JPanel firstPanel, detaliiPanel, buttonPanel;
-
-        editCategorieLabel = new JLabel("Categorie:");
-        editIDLabel = new JLabel("ID produs:");
-        String[] items = new String[] {"Filme", "Jocuri", "Albume"};
-        editCategorieBox = new JComboBox(items);
-        editIDField = new JTextField();
-        exit = new JButton("Exit");
-        proceed = new JButton("Proceed");
-
-        detaliiPanel = new JPanel(new GridLayout(2,2,5,5));
-        detaliiPanel.add(editCategorieLabel);
-        detaliiPanel.add(editCategorieBox);
-        detaliiPanel.add(editIDLabel);
-        detaliiPanel.add(editIDField);
-
-        buttonPanel = new JPanel(new GridLayout(1,2,5,5));
-        buttonPanel.add(proceed);
-        buttonPanel.add(exit);
-
-        firstPanel = new JPanel(new BorderLayout());
-        firstPanel.add(detaliiPanel, BorderLayout.CENTER);
-        firstPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        JFrame firstWindow = new JFrame();
-        firstWindow.add(firstPanel);
-        firstWindow.setVisible(true);
-        firstWindow.setSize(300,300);
-        firstWindow.setLocationRelativeTo(null);
-
-        proceed.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JButton save, exit, delete;
-                JPanel secondWindowMain, secondWindowDetalii, secondWindowButoane;
-                StockManager stockMan = StockManager.getInstance();
-                MovieManager movieMan = MovieManager.getInstance();
-                GameManager gameMan = GameManager.getInstance();
-                AlbumManager albumMan = AlbumManager.getInstance();
-
-                if (editCategorieBox.getSelectedItem().equals("Filme")) {
-                    JLabel editProdTitluLabel, editProdActorLabel, editProdDirectorLabel, editProdDurataLabel, editProdGenLabel, editProdAnLabel, editProdAudientaLabel,
-                            editProdCantLabel, editProdPretLabel;
-                    JTextField editProdTitluField, editProdActorField, editProdDirectorField, editProdDurataField, editProdGenField, editProdAnField, editProdAudientaField,
-                            editProdCantField, editProdPretField;
-
-                    Movie movie = new Movie();
-                    movie.setIdMovie(Integer.parseInt(editIDField.getText()));
-                    Store store = new Store();
-                    store.setId(employee.getIdMag());
-                    Stock stock = stockMan.getMovieStock(movie, store);
-
-                    if (stock == null) {
-                        JFrame dialog = new JFrame();
-                        JOptionPane.showMessageDialog(dialog, "ID-ul introdus nu exista in baza de date", "Warning", JOptionPane.WARNING_MESSAGE);
-                    } else {
-                        stock.setMovie(movieMan.getMovieById(movie.getIdMovie()));
-                        movie = stock.getMovie();
-                        editProdTitluLabel = new JLabel("Titlu:");
-                        editProdTitluField = new JTextField();
-                        editProdTitluField.setText(movie.getTitle());
-                        editProdActorLabel = new JLabel("Actor:");
-                        editProdActorField = new JTextField();
-                        editProdActorField.setText(movie.getMainActor());
-                        editProdDirectorLabel = new JLabel("Director:");
-                        editProdDirectorField = new JTextField();
-                        editProdDirectorField.setText(movie.getDirector());
-                        editProdDurataLabel = new JLabel("Durata:");
-                        editProdDurataField = new JTextField();
-                        editProdDurataField.setText(movie.getDuration() + "");
-                        editProdGenLabel = new JLabel("Gen:");
-                        editProdGenField = new JTextField();
-                        editProdGenField.setText(movie.getGenre());
-                        editProdAnLabel = new JLabel("An:");
-                        editProdAnField = new JTextField();
-                        editProdAnField.setText(movie.getYear());
-                        editProdAudientaLabel = new JLabel("Audienta:");
-                        editProdAudientaField = new JTextField();
-                        editProdAudientaField.setText(movie.getAudience() + "");
-                        editProdCantLabel = new JLabel("Cantitate:");
-                        editProdCantField = new JTextField();
-                        editProdCantField.setText(stock.getQuantity() + "");
-                        editProdPretLabel = new JLabel("Pret:");
-                        editProdPretField = new JTextField();
-                        editProdPretField.setText(stock.getPrice() + "");
-                        save = new JButton("Save");
-                        exit = new JButton("Exit");
-                        delete = new JButton("Delete");
-
-                        secondWindowDetalii = new JPanel(new GridLayout(9, 9, 5, 5));
-                        secondWindowDetalii.add(editProdTitluLabel);
-                        secondWindowDetalii.add(editProdTitluField);
-                        secondWindowDetalii.add(editProdActorLabel);
-                        secondWindowDetalii.add(editProdActorField);
-                        secondWindowDetalii.add(editProdDirectorLabel);
-                        secondWindowDetalii.add(editProdDirectorField);
-                        secondWindowDetalii.add(editProdDurataLabel);
-                        secondWindowDetalii.add(editProdDurataField);
-                        secondWindowDetalii.add(editProdGenLabel);
-                        secondWindowDetalii.add(editProdGenField);
-                        secondWindowDetalii.add(editProdAnLabel);
-                        secondWindowDetalii.add(editProdAnField);
-                        secondWindowDetalii.add(editProdAudientaLabel);
-                        secondWindowDetalii.add(editProdAudientaField);
-                        secondWindowDetalii.add(editProdCantLabel);
-                        secondWindowDetalii.add(editProdCantField);
-                        secondWindowDetalii.add(editProdPretLabel);
-                        secondWindowDetalii.add(editProdPretField);
-                        secondWindowButoane = new JPanel(new GridLayout(1, 3, 5, 5));
-                        secondWindowButoane.add(save);
-                        secondWindowButoane.add(delete);
-                        secondWindowButoane.add(exit);
-
-                        secondWindowMain = new JPanel(new BorderLayout());
-                        secondWindowMain.add(secondWindowDetalii, BorderLayout.CENTER);
-                        secondWindowMain.add(secondWindowButoane, BorderLayout.SOUTH);
-                        JFrame secondWindow = new JFrame();
-                        secondWindow.add(secondWindowMain);
-                        secondWindow.setVisible(true);
-                        secondWindow.setSize(300, 300);
-
-                        save.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                JFrame dialog = new JFrame();
-                                int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa modificati produsul?", "Warning", JOptionPane.YES_NO_OPTION);
-                                if (a == JOptionPane.YES_OPTION) {
-                                    Movie movie = stock.getMovie();
-                                    movie.setIdMovie(Integer.parseInt(editIDField.getText()));
-                                    movie.setTitle(editProdTitluField.getText());
-                                    movie.setMainActor(editProdActorField.getText());
-                                    movie.setDirector(editProdDirectorField.getText());
-                                    movie.setDuration(Integer.parseInt(editProdDurataField.getText()));
-                                    movie.setGenre(editProdGenField.getText());
-                                    movie.setYear(editProdAnField.getText());
-                                    movie.setAudience(Integer.parseInt(editProdAudientaField.getText()));
-                                    stock.setPrice(Integer.parseInt(editProdPretField.getText()));
-                                    stock.setQuantity(Integer.parseInt(editProdCantField.getText()));
-
-                                    movieMan.updateMovie(movie);
-                                    stockMan.updateMovieStock(movie, stock.getStore(), stock.getQuantity(), stock.getPrice());
-                                }
-                            }
-                        });
-
-                        delete.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                JFrame dialog = new JFrame();
-                                int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa stergeti produsul?", "Warning", JOptionPane.YES_NO_OPTION);
-                                if (a == JOptionPane.YES_OPTION) {
-                                    stockMan.deleteMovieStock(stock.getMovie(), stock.getStore());
-                                    secondWindow.setVisible(false);
-                                    secondWindow.dispose();
-                                }
-                            }
-                        });
-
-                        exit.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                secondWindow.setVisible(false);
-                                secondWindow.dispose();
-                            }
-                        });
-                    }
-                } else if (editCategorieBox.getSelectedItem().equals("Jocuri")) {
-                    JLabel editProdTitluLabel, editProdPlatformaLabel, editProdDeveloperLabel, editProdPublisherLabel, editProdGenLabel, editProdAnLabel, editProdAudientaLabel,
-                            editProdCantLabel, editProdPretLabel;
-                    JTextField editProdTitluField, editProdPlatformaField, editProdDeveloperField, editProdPublisherField, editProdGenField, editProdAnField, editProdAudientaField,
-                            editProdCantField, editProdPretField;
-
-                    Game game = new Game();
-                    game.setIdGame(Integer.parseInt(editIDField.getText()));
-                    Store store = new Store();
-                    store.setId(employee.getIdMag());
-                    Stock stock = stockMan.getGameStock(game, store);
-                    stock.setGame(gameMan.getGameById(game.getIdGame()));
-
-                    game = stock.getGame();
-                    if (stock == null) {
-                        JFrame dialog = new JFrame();
-                        JOptionPane.showMessageDialog(dialog, "ID-ul introdus nu exista in baza de date", "Warning", JOptionPane.WARNING_MESSAGE);
-                    } else {
-                        editProdTitluLabel = new JLabel("Titlu:");
-                        editProdTitluField = new JTextField();
-                        editProdTitluField.setText(game.getTitle());
-                        editProdPlatformaLabel = new JLabel("Platforma:");
-                        editProdPlatformaField = new JTextField();
-                        editProdPlatformaField.setText(game.getPlatform());
-                        editProdDeveloperLabel = new JLabel("Developer:");
-                        editProdDeveloperField = new JTextField();
-                        editProdDeveloperField.setText(game.getDeveloper());
-                        editProdPublisherLabel = new JLabel("Publisher:");
-                        editProdPublisherField = new JTextField();
-                        editProdPublisherField.setText(game.getPublisher());
-                        editProdGenLabel = new JLabel("Gen:");
-                        editProdGenField = new JTextField();
-                        editProdGenField.setText(game.getGenre());
-                        editProdAnLabel = new JLabel("An:");
-                        editProdAnField = new JTextField();
-                        editProdAnField.setText(game.getYear());
-                        editProdAudientaLabel = new JLabel("Audienta:");
-                        editProdAudientaField = new JTextField();
-                        editProdAudientaField.setText(game.getAudience() + "");
-                        editProdCantLabel = new JLabel("Cantitate:");
-                        editProdCantField = new JTextField();
-                        editProdCantField.setText(stock.getQuantity() + "");
-                        editProdPretLabel = new JLabel("Pret:");
-                        editProdPretField = new JTextField();
-                        editProdPretField.setText(stock.getPrice() + "");
-                        save = new JButton("Save");
-                        exit = new JButton("Exit");
-                        delete = new JButton("Delete");
-
-                        secondWindowDetalii = new JPanel(new GridLayout(9, 9, 5, 5));
-                        secondWindowDetalii.add(editProdTitluLabel);
-                        secondWindowDetalii.add(editProdTitluField);
-                        secondWindowDetalii.add(editProdPlatformaLabel);
-                        secondWindowDetalii.add(editProdPlatformaField);
-                        secondWindowDetalii.add(editProdDeveloperLabel);
-                        secondWindowDetalii.add(editProdDeveloperField);
-                        secondWindowDetalii.add(editProdPublisherLabel);
-                        secondWindowDetalii.add(editProdPublisherField);
-                        secondWindowDetalii.add(editProdGenLabel);
-                        secondWindowDetalii.add(editProdGenField);
-                        secondWindowDetalii.add(editProdAnLabel);
-                        secondWindowDetalii.add(editProdAnField);
-                        secondWindowDetalii.add(editProdAudientaLabel);
-                        secondWindowDetalii.add(editProdAudientaField);
-                        secondWindowDetalii.add(editProdCantLabel);
-                        secondWindowDetalii.add(editProdCantField);
-                        secondWindowDetalii.add(editProdPretLabel);
-                        secondWindowDetalii.add(editProdPretField);
-                        secondWindowButoane = new JPanel(new GridLayout(1, 3, 5, 5));
-                        secondWindowButoane.add(save);
-                        secondWindowButoane.add(delete);
-                        secondWindowButoane.add(exit);
-
-                        secondWindowMain = new JPanel(new BorderLayout());
-                        secondWindowMain.add(secondWindowDetalii, BorderLayout.CENTER);
-                        secondWindowMain.add(secondWindowButoane, BorderLayout.SOUTH);
-                        JFrame secondWindow = new JFrame();
-                        secondWindow.add(secondWindowMain);
-                        secondWindow.setVisible(true);
-                        secondWindow.setSize(300, 300);
-
-                        save.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                JFrame dialog = new JFrame();
-                                int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa modificati produsul?", "Warning", JOptionPane.YES_NO_OPTION);
-                                if (a == JOptionPane.YES_OPTION) {
-                                    Game game = stock.getGame();
-                                    game.setIdGame(Integer.parseInt(editIDField.getText()));
-                                    game.setTitle(editProdTitluField.getText());
-                                    game.setPlatform(editProdPlatformaField.getText());
-                                    game.setDeveloper(editProdDeveloperField.getText());
-                                    game.setPublisher(editProdPublisherField.getText());
-                                    game.setYear(editProdAnField.getText());
-                                    game.setGenre(editProdGenField.getText());
-                                    game.setAudience(Integer.parseInt(editProdAudientaField.getText()));
-                                    stock.setQuantity(Integer.parseInt(editProdCantField.getText()));
-                                    stock.setPrice(Integer.parseInt(editProdPretField.getText()));
-
-                                    gameMan.updateGame(game);
-                                    stockMan.updateGameStock(game, stock.getStore(), stock.getQuantity(), stock.getPrice());
-                                }
-                            }
-                        });
-
-                        delete.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                JFrame dialog = new JFrame();
-                                int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa stergeti produsul?", "Warning", JOptionPane.YES_NO_OPTION);
-                                if (a == JOptionPane.YES_OPTION) {
-                                    stockMan.deleteGameStock(stock.getGame(), stock.getStore());
-                                    secondWindow.setVisible(false);
-                                    secondWindow.dispose();
-                                }
-                            }
-                        });
-
-                        exit.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                secondWindow.setVisible(false);
-                                secondWindow.dispose();
-                            }
-                        });
-                    }
-                } else if (editCategorieBox.getSelectedItem().equals("Albume")) {
-                    JLabel editProdTitluLabel, editProdTrupaLabel, editProdMelodiiLabel, editProdCasaDiscLabel, editProdGenLabel, editProdAnLabel,
-                            editProdCantLabel, editProdPretLabel;
-                    JTextField editProdTitluField, editProdTrupaField, editProdMelodiiField, editProdCasaDiscField, editProdGenField, editProdAnField,
-                            editProdCantField, editProdPretField;
-
-                    Album album = new Album();
-                    album.setIdAlbum(Integer.parseInt(editIDField.getText()));
-                    Store store = new Store();
-                    store.setId(employee.getIdMag());
-                    Stock stock = stockMan.getAlbumStock(album, store);
-                    stock.setAlbum(albumMan.getAlbumById(album.getIdAlbum()));
-
-                    album = stock.getAlbum();
-                    if (stock == null) {
-                        JFrame dialog = new JFrame();
-                        JOptionPane.showMessageDialog(dialog, "ID-ul introdus nu exista in baza de date", "Warning", JOptionPane.WARNING_MESSAGE);
-                    } else {
-                        editProdTitluLabel = new JLabel("Titlu:");
-                        editProdTitluField = new JTextField();
-                        editProdTitluField.setText(album.getTitle());
-                        editProdTrupaLabel = new JLabel("Trupa:");
-                        editProdTrupaField = new JTextField();
-                        editProdTrupaField.setText(album.getArtist());
-                        editProdMelodiiLabel = new JLabel("Numar melodii:");
-                        editProdMelodiiField = new JTextField();
-                        editProdMelodiiField.setText(album.getNrMel() + "");
-                        editProdCasaDiscLabel = new JLabel("Casa discuri:");
-                        editProdCasaDiscField = new JTextField();
-                        editProdCasaDiscField.setText(album.getProducer());
-                        editProdGenLabel = new JLabel("Gen:");
-                        editProdGenField = new JTextField();
-                        editProdGenField.setText(album.getGenre());
-                        editProdAnLabel = new JLabel("An:");
-                        editProdAnField = new JTextField();
-                        editProdAnField.setText(album.getYear());
-                        editProdCantLabel = new JLabel("Cantitate:");
-                        editProdCantField = new JTextField();
-                        editProdCantField.setText(stock.getQuantity() + "");
-                        editProdPretLabel = new JLabel("Pret:");
-                        editProdPretField = new JTextField();
-                        editProdPretField.setText(stock.getPrice() + "");
-                        save = new JButton("Save");
-                        exit = new JButton("Exit");
-                        delete = new JButton("Delete");
-
-                        secondWindowDetalii = new JPanel(new GridLayout(8, 8, 5, 5));
-                        secondWindowDetalii.add(editProdTitluLabel);
-                        secondWindowDetalii.add(editProdTitluField);
-                        secondWindowDetalii.add(editProdTrupaLabel);
-                        secondWindowDetalii.add(editProdTrupaField);
-                        secondWindowDetalii.add(editProdMelodiiLabel);
-                        secondWindowDetalii.add(editProdMelodiiField);
-                        secondWindowDetalii.add(editProdCasaDiscLabel);
-                        secondWindowDetalii.add(editProdCasaDiscField);
-                        secondWindowDetalii.add(editProdGenLabel);
-                        secondWindowDetalii.add(editProdGenField);
-                        secondWindowDetalii.add(editProdAnLabel);
-                        secondWindowDetalii.add(editProdAnField);
-                        secondWindowDetalii.add(editProdCantLabel);
-                        secondWindowDetalii.add(editProdCantField);
-                        secondWindowDetalii.add(editProdPretLabel);
-                        secondWindowDetalii.add(editProdPretField);
-                        secondWindowButoane = new JPanel(new GridLayout(1, 3, 5, 5));
-                        secondWindowButoane.add(save);
-                        secondWindowButoane.add(delete);
-                        secondWindowButoane.add(exit);
-
-                        secondWindowMain = new JPanel(new BorderLayout());
-                        secondWindowMain.add(secondWindowDetalii, BorderLayout.CENTER);
-                        secondWindowMain.add(secondWindowButoane, BorderLayout.SOUTH);
-                        JFrame secondWindow = new JFrame();
-                        secondWindow.add(secondWindowMain);
-                        secondWindow.setVisible(true);
-                        secondWindow.setSize(300, 300);
-
-                        save.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                JFrame dialog = new JFrame();
-                                int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa modificati produsul?", "Warning", JOptionPane.YES_NO_OPTION);
-                                if (a == JOptionPane.YES_OPTION) {
-                                    Album album = stock.getAlbum();
-                                    album.setIdAlbum(Integer.parseInt(editIDField.getText()));
-                                    album.setTitle(editProdTitluField.getText());
-                                    album.setArtist(editProdTrupaField.getText());
-                                    album.setNrMel(Integer.parseInt(editProdMelodiiField.getText()));
-                                    album.setProducer(editProdCasaDiscField.getText());
-                                    album.setYear(editProdAnField.getText());
-                                    album.setGenre(editProdGenField.getText());
-                                    stock.setQuantity(Integer.parseInt(editProdCantField.getText()));
-                                    stock.setPrice(Integer.parseInt(editProdPretField.getText()));
-
-                                    albumMan.updateAlbum(album);
-                                    stockMan.updateAlbumStock(album, stock.getStore(), stock.getQuantity(), stock.getPrice());
-                                }
-                            }
-                        });
-
-                        delete.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                JFrame dialog = new JFrame();
-                                int a = JOptionPane.showConfirmDialog(dialog, "Sunteti sigur ca doriti sa stergeti produsul?", "Warning", JOptionPane.YES_NO_OPTION);
-                                if (a == JOptionPane.YES_OPTION) {
-                                    stockMan.deleteAlbumStock(stock.getAlbum(), stock.getStore());
-                                    secondWindow.setVisible(false);
-                                    secondWindow.dispose();
-                                }
-                            }
-                        });
-
-                        exit.addActionListener(new ActionListener() {
-                            @Override
-                            public void actionPerformed(ActionEvent e) {
-                                secondWindow.setVisible(false);
-                                secondWindow.dispose();
-                            }
-                        });
-                    }
-                }
-            }
-        });
-
-        exit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                firstWindow.setVisible(false);
-                firstWindow.dispose();
-            }
-        });
-
-    }
-
-    private void newCustomerWindow() {
-        //Username
-        JLabel newUserLabel = new JLabel();
-        newUserLabel.setText("Username: ");
-        JTextField newUsernameText = new JTextField();
-
-        //Password
-        JLabel newPasswordLabel = new JLabel();
-        newPasswordLabel.setText("Password: ");
-        JPasswordField newPasswordText = new JPasswordField();
-
-        //Email
-        JLabel newEmailLabel = new JLabel();
-        newEmailLabel.setText("Email: ");
-        JTextField newEmailText = new JTextField();
-
-        //First Name
-        JLabel newNameLabel = new JLabel();
-        newNameLabel.setText("Nume: ");
-        JTextField newNameText = new JTextField();
-
-        //Last Name
-        JLabel newPrenLabel = new JLabel();
-        newPrenLabel.setText("Prenume: ");
-        JTextField newPrenText = new JTextField();
-
-        //Address
-        JLabel newAddressLabel = new JLabel();
-        newAddressLabel.setText("Address: ");
-        JTextField newAddressText = new JTextField();
-
-        //City
-        JLabel newCityLabel = new JLabel();
-        newCityLabel.setText("City: ");
-        JTextField newCityText = new JTextField();
-
-        //CNP
-        JLabel newCNPLabel = new JLabel();
-        newCNPLabel.setText("CNP: ");
-        JTextField newCNPText = new JTextField();
-
-        //Phone
-        JLabel newTelLabel = new JLabel();
-        newTelLabel.setText("Phone: ");
-        JTextField newTelText = new JTextField();
-
-        //Birthday
-        JLabel newBirthYearLabel = new JLabel("Year(yyyy)");
-        JLabel newBirthMonthLabel = new JLabel("Month(mm)");
-        JLabel newBirthDayLabel = new JLabel("Day(dd)");
-        JTextField newBirthYearText = new JTextField();
-        JTextField newBirthMonthText = new JTextField();
-        JTextField newBirthDayText = new JTextField();
-
-        //Data panel
-        JPanel newDataPanel = new JPanel(new GridLayout(9,2,5,5));
-        newDataPanel.add(newUserLabel);
-        newDataPanel.add(newUsernameText);
-        newDataPanel.add(newPasswordLabel);
-        newDataPanel.add(newPasswordText);
-        newDataPanel.add(newEmailLabel);
-        newDataPanel.add(newEmailText);
-        newDataPanel.add(newNameLabel);
-        newDataPanel.add(newNameText);
-        newDataPanel.add(newPrenLabel);
-        newDataPanel.add(newPrenText);
-        newDataPanel.add(newAddressLabel);
-        newDataPanel.add(newAddressText);
-        newDataPanel.add(newCityLabel);
-        newDataPanel.add(newCityText);
-        newDataPanel.add(newCNPLabel);
-        newDataPanel.add(newCNPText);
-        newDataPanel.add(newTelLabel);
-        newDataPanel.add(newTelText);
-
-        //Birth Panel
-        JPanel newBirthPanel = new JPanel(new GridLayout(2,3,5,5));
-        newBirthPanel.add(newBirthYearLabel);
-        newBirthPanel.add(newBirthMonthLabel);
-        newBirthPanel.add(newBirthDayLabel);
-        newBirthPanel.add(newBirthYearText);
-        newBirthPanel.add(newBirthMonthText);
-        newBirthPanel.add(newBirthDayText);
-
-        //Button Panel
-        JPanel newButtonPanel = new JPanel(new GridLayout(1,2,5,5));
-        JButton newCreateButton = new JButton("Create");
-        JButton newCancelButton = new JButton("Cancel");
-        newButtonPanel.add(newCreateButton);
-        newButtonPanel.add(newCancelButton);
-
-        //dvdmania.tools.Main Panel
-        JPanel newMainPanel = new JPanel(new BorderLayout());
-        newMainPanel.add(newDataPanel, BorderLayout.NORTH);
-        newMainPanel.add(newBirthPanel, BorderLayout.CENTER);
-        newMainPanel.add(newButtonPanel, BorderLayout.SOUTH);
-
-        JFrame newFrame = new JFrame();
-        newFrame.add(newMainPanel);
-        newFrame.setVisible(true);
-        newFrame.setSize(300,330);
-        newFrame.setLocationRelativeTo(null);
-
-        newCancelButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFrame f = new JFrame();
-                int a = JOptionPane.showConfirmDialog(f, "Are you sure?", "Exiting", JOptionPane.YES_NO_OPTION);
-                if(a == JOptionPane.YES_OPTION) {
-                    newFrame.setVisible(false);
-                    newFrame.dispose();
-                }
-            }
-        });
-
-        newCreateButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                String username = newUsernameText.getText();
-                String password = String.valueOf(newPasswordText.getPassword());
-                String email = newEmailText.getText();
-                String firstName = newNameText.getText();
-                String lastName = newPrenText.getText();
-                String address = newAddressText.getText();
-                String city = newCityText.getText();
-                String cnp = newCNPText.getText();
-                String phone = newTelText.getText();
-
-                String year = newBirthYearText.getText();
-                String month = newBirthMonthText.getText();
-                String day = newBirthDayText.getText();
-
-                if(username.equals("") || password.equals("") || email.equals("") || firstName.equals("") || lastName.equals("") || address.equals("") || city.equals("")
-                        || cnp.equals("") || phone.equals("") || year.equals("") || month.equals("") || day.equals("")) {
-                    JFrame warningDialog = new JFrame();
-                    JOptionPane.showMessageDialog(warningDialog, "You must complete all fields!", "Warning", JOptionPane.WARNING_MESSAGE);
-                } else {
-                    String birthdate = new String(year + "-" + month + "-" + day);
-
-                    Client client = new Client(0, lastName, firstName, address, city, LocalDate.parse(birthdate), cnp, phone, (email.isEmpty()) ? null : email, 5);
-                    Account account = new Account(0, username, password, null, 1, client.getId());
-                    AccountManager accountMan = AccountManager.getInstance();
-                    ClientManager clientMan = ClientManager.getInstance();
-
-                    int clID = clientMan.createClient(client);
-                    account.setIdUtil(clID);
-                    int accID = accountMan.createClientAccount(account);
-
-                    if (clID != 0) {
-                        if (accID != 0) {
-                            JFrame confirmDialog = new JFrame();
-                            JOptionPane.showMessageDialog(confirmDialog, "Client data has been successfully uploaded.");
-                        } else {
-                            JFrame confirmDialog = new JFrame();
-                            JOptionPane.showMessageDialog(confirmDialog, "There was a problem creating the account.");
-                        }
-                    } else {
-                        JFrame confirmDialog = new JFrame();
-                        JOptionPane.showMessageDialog(confirmDialog, "There was a problem uploading the client.");
-                    }
-                }
-            }
-        });
-    }
-
-    private void editCustomerWindow() {
-        ClientManager clientMan = ClientManager.getInstance();
-        ArrayList<Client> customers = clientMan.getAllClients();
-        JTable table = new JTable();
-        DefaultTableModel tableModel;
-
-        tableModel = new DefaultTableModel() {
-            public boolean isCellEditable(int row, int column) {
-                return false;
-            }
-        };
-
-        String[] columns = new String[]{"ID", "Nume", "Prenume", "Adresa", "Oras", "Data nasterii", "CNP", "Telefon", "Email", "Loialitate", "Username", "Password"};
-        tableModel.setColumnIdentifiers(columns);
-
-        for(int i = 0; i < customers.size(); i++) {
-            Client client = customers.get(i);
-            tableModel.addRow(clientMan.clientToRow(client));
-        }
-
-        table.setModel(tableModel);
-        JScrollPane scroll = new JScrollPane(table);
-
-        JButton edit, exit;
-        JPanel firstWindowPanel, firstWindowButtonsPanel;
-        edit = new JButton("Edit");
-        exit = new JButton("Exit");
-        firstWindowButtonsPanel = new JPanel(new GridLayout(1,2,5,5));
-        firstWindowButtonsPanel.add(edit);
-        firstWindowButtonsPanel.add(exit);
-        firstWindowPanel = new JPanel(new BorderLayout());
-        firstWindowPanel.add(scroll, BorderLayout.CENTER);
-        firstWindowPanel.add(firstWindowButtonsPanel, BorderLayout.SOUTH);
-        JFrame firstWindow = new JFrame();
-        firstWindow.add(firstWindowPanel);
-        firstWindow.setVisible(true);
-        firstWindow.setSize(1000,300);
-        firstWindow.setTitle("Clienti");
-        firstWindow.setLocationRelativeTo(null);
-
-        edit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(table.getSelectionModel().isSelectionEmpty()) {
-                    JFrame warningDialog = new JFrame();
-                    JOptionPane.showMessageDialog(warningDialog, "Alegeti mai intai un client din lista!", "Eroare", JOptionPane.WARNING_MESSAGE);
-                } else {
-                    JLabel custNumeLabel, custPrenumeLabel, custAdresaLabel, custOrasLabel, custDatNasLabel, custCNPLabel, custTelLabel, custEmailLabel,
-                            custUserLabel, custPassLabel;
-                    JTextField custNumeField, custPrenumeField, custAdresaField, custOrasField, custDatNasField, custCNPField, custTelField, custEmailField,
-                            custUserField, custPassField;
-                    JButton exit, save;
-
-                    custNumeLabel = new JLabel("Nume:");
-                    custNumeField = new JTextField();
-                    custNumeField.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 1)));
-                    custPrenumeLabel = new JLabel("Prenume:");
-                    custPrenumeField = new JTextField();
-                    custPrenumeField.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 2)));
-                    custAdresaLabel = new JLabel("Adresa:");
-                    custAdresaField = new JTextField();
-                    custAdresaField.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 3)));
-                    custOrasLabel = new JLabel("Oras:");
-                    custOrasField = new JTextField();
-                    custOrasField.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 4)));
-                    custDatNasLabel = new JLabel("Data nasterii:");
-                    custDatNasField = new JTextField();
-                    custDatNasField.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 5)));
-                    custCNPLabel = new JLabel("CNP:");
-                    custCNPField = new JTextField();
-                    custCNPField.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 6)));
-                    custTelLabel = new JLabel("Telefon:");
-                    custTelField = new JTextField();
-                    custTelField.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 7)));
-                    custEmailLabel = new JLabel("Email:");
-                    custEmailField = new JTextField();
-                    custEmailField.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 8)));
-                    custUserLabel = new JLabel("Username:");
-                    custUserField = new JTextField();
-                    custUserField.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 10)));
-                    custPassLabel = new JLabel("Password:");
-                    custPassField = new JTextField();
-                    custPassField.setText(String.valueOf(table.getValueAt(table.getSelectedRow(), 11)));
-
-                    exit = new JButton("Exit");
-                    save = new JButton("Save");
-
-                    JPanel userDetaliiPanel, userMainPanel, userButtonPanel;
-                    userDetaliiPanel = new JPanel(new GridLayout(10,10,5,5));
-                    userDetaliiPanel.add(custNumeLabel);
-                    userDetaliiPanel.add(custNumeField);
-                    userDetaliiPanel.add(custPrenumeLabel);
-                    userDetaliiPanel.add(custPrenumeField);
-                    userDetaliiPanel.add(custAdresaLabel);
-                    userDetaliiPanel.add(custAdresaField);
-                    userDetaliiPanel.add(custOrasLabel);
-                    userDetaliiPanel.add(custOrasField);
-                    userDetaliiPanel.add(custDatNasLabel);
-                    userDetaliiPanel.add(custDatNasField);
-                    userDetaliiPanel.add(custCNPLabel);
-                    userDetaliiPanel.add(custCNPField);
-                    userDetaliiPanel.add(custTelLabel);
-                    userDetaliiPanel.add(custTelField);
-                    userDetaliiPanel.add(custEmailLabel);
-                    userDetaliiPanel.add(custEmailField);
-                    userDetaliiPanel.add(custUserLabel);
-                    userDetaliiPanel.add(custUserField);
-                    userDetaliiPanel.add(custPassLabel);
-                    userDetaliiPanel.add(custPassField);
-                    userButtonPanel = new JPanel(new GridLayout(1,2,5,5));
-                    userButtonPanel.add(save);
-                    userButtonPanel.add(exit);
-                    userMainPanel = new JPanel(new BorderLayout());
-                    userMainPanel.add(userDetaliiPanel, BorderLayout.CENTER);
-                    userMainPanel.add(userButtonPanel, BorderLayout.SOUTH);
-
-                    JFrame frame = new JFrame();
-                    frame.add(userMainPanel);
-                    frame.setVisible(true);
-                    frame.setSize(300,300);
-                    frame.setTitle("Client");
-
-                    save.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            JFrame f = new JFrame();
-                            int a = JOptionPane.showConfirmDialog(f, "Are you sure?", "Saving", JOptionPane.YES_NO_OPTION);
-                            if(a == JOptionPane.YES_OPTION) {
-                                AccountManager accMan = AccountManager.getInstance();
-
-                                Client client = new Client();
-                                client.setId(Integer.parseInt(String.valueOf(table.getValueAt(table.getSelectedRow(), 0))));
-                                client.setNume(custNumeField.getText());
-                                client.setPrenume(custPrenumeField.getText());
-                                client.setAdresa(custAdresaField.getText());
-                                client.setOras(custOrasField.getText());
-                                client.setDatan(LocalDate.parse(custDatNasField.getText()));
-                                client.setCnp(custCNPField.getText());
-                                client.setTel(custTelField.getText());
-                                client.setEmail((custEmailField.getText().isEmpty()) ? null : custEmailField.getText());
-                                client.setAccount(accMan.getClientAccount(client));
-                                client.getAccount().setUsername(custUserField.getText());
-                                client.getAccount().setPassword(custPassField.getText());
-
-                                accMan.updateClientAccount(client.getAccount());
-                                clientMan.updateClient(client);
-                            }
-                        }
-                    });
-
-                    exit.addActionListener(new ActionListener() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            frame.setVisible(false);
-                            frame.dispose();
-                        }
-                    });
-                }
-            }
-        });
-
-        exit.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                firstWindow.setVisible(false);
-                firstWindow.dispose();
-            }
-        });
-    }
 
     private void newEmployeeWindow() {
         //Username

@@ -25,9 +25,114 @@ public class StockManager {
         return instance;
     }
 
-//    public ArrayList<Stock> getAllStock() {
-//
-//    }
+    public ArrayList<Stock> getAllStock() {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet result = null;
+        ArrayList<Stock> stockList = new ArrayList<>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, id_film, id_joc, id_album, id_mag, cant, pret FROM produse";
+            statement = connection.createStatement();
+            result = statement.executeQuery(sql);
+
+            while (result.next()) {
+                int idStock = result.getInt("id_prod");
+                int idMovie = result.getInt("id_film");
+                int idGame = result.getInt("id_joc");
+                int idAlbum = result.getInt("id_album");
+                int idStore = result.getInt("id_mag");
+                int quantity = result.getInt("cant");
+                int price = result.getInt("pret");
+
+                Stock stock = new Stock();
+                stock.setIdProduct(idStock);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+
+                if (idMovie != 0) {
+                    MovieManager movieMan = MovieManager.getInstance();
+                    stock.setMovie(movieMan.getMovieById(idMovie));
+                } else if (idGame != 0) {
+                    GameManager gameMan = GameManager.getInstance();
+                    stock.setGame(gameMan.getGameById(idGame));
+                } else if (idAlbum != 0) {
+                    AlbumManager albumMan = AlbumManager.getInstance();
+                    stock.setAlbum(albumMan.getAlbumById(idAlbum));
+                }
+
+                StoreManager storeMan = StoreManager.getInstance();
+                stock.setStore(storeMan.getStoreById(idStore));
+
+                stockList.add(stock);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stockList;
+    }
+
+    public ArrayList<Stock> getAllStock(Store store) {
+        Connection connection = null;
+        PreparedStatement statement = null;
+        ResultSet result = null;
+        ArrayList<Stock> stockList = new ArrayList<>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT id_prod, id_film, id_joc, id_album, cant, pret FROM produse WHERE id_mag=?";
+            statement = connection.prepareStatement(sql);
+            statement.setInt(1, store.getId());
+            result = statement.executeQuery();
+
+            while (result.next()) {
+                int idStock = result.getInt("id_prod");
+                int idMovie = result.getInt("id_film");
+                int idGame = result.getInt("id_joc");
+                int idAlbum = result.getInt("id_album");
+                int quantity = result.getInt("cant");
+                int price = result.getInt("pret");
+
+                Stock stock = new Stock();
+                stock.setIdProduct(idStock);
+                stock.setQuantity(quantity);
+                stock.setPrice(price);
+
+                if (idMovie != 0) {
+                    MovieManager movieMan = MovieManager.getInstance();
+                    stock.setMovie(movieMan.getMovieById(idMovie));
+                } else if (idGame != 0) {
+                    GameManager gameMan = GameManager.getInstance();
+                    stock.setGame(gameMan.getGameById(idGame));
+                } else if (idAlbum != 0) {
+                    AlbumManager albumMan = AlbumManager.getInstance();
+                    stock.setAlbum(albumMan.getAlbumById(idAlbum));
+                }
+
+                stock.setStore(store);
+
+                stockList.add(stock);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, result);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return stockList;
+    }
 
     public Stock getStockById(int id) {
         Connection connection = null;

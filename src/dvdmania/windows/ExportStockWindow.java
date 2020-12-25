@@ -1,7 +1,10 @@
 package dvdmania.windows;
 
+import dvdmania.management.Stock;
+import dvdmania.management.StockManager;
 import dvdmania.management.Store;
 import dvdmania.management.StoreManager;
+import dvdmania.tools.ExportExcel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
-public class ExportStockWindow extends JFrame {
+public final class ExportStockWindow extends JFrame {
 
     private static ExportStockWindow instance = null;
 
@@ -33,10 +36,10 @@ public class ExportStockWindow extends JFrame {
         comboBoxStores = new JComboBox<String>();
         comboBoxStores.addItem("Toate");
 
-        StoreManager storeMan = StoreManager.getInstance();
-        ArrayList<Store> stores = storeMan.getStores();
+        final StoreManager storeMan = StoreManager.getInstance();
+        final ArrayList<Store> stores = storeMan.getStores();
 
-        for (Store store : stores) {
+        for (final Store store : stores) {
             comboBoxStores.addItem(store.getOras());
         }
 
@@ -69,8 +72,20 @@ public class ExportStockWindow extends JFrame {
         exportButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String city = (String) comboBoxStores.getSelectedItem();
+                final String city = (String) comboBoxStores.getSelectedItem();
 
+                final StockManager stockMan = StockManager.getInstance();
+                ArrayList<Stock> stocks = null;
+
+                if (city.equals("Toate")) {
+                    stocks = stockMan.getAllStock();
+                    ExportExcel.getInstance().writeStockToExcel(stocks, null);
+                } else {
+                    final StoreManager storeMan = StoreManager.getInstance();
+                    final Store store = storeMan.getStoreByCity(city);
+                    stocks = stockMan.getAllStock(store);
+                    ExportExcel.getInstance().writeStockToExcel(stocks, city);
+                }
             }
         });
 

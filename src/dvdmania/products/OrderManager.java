@@ -3,12 +3,10 @@ package dvdmania.products;
 import dvdmania.management.*;
 import dvdmania.tools.ConnectionManager;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class OrderManager {
 
@@ -502,5 +500,69 @@ public class OrderManager {
         }
 
         return orderList;
+    }
+
+    public HashMap<String, Integer> getOrderTimeline() {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        HashMap<String, Integer> orderTimeline = new HashMap<String, Integer>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT YEAR(data_imp) AS An, COUNT(id_prod) AS Produse FROM imprumuturi GROUP BY YEAR(data_imp)";
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                String year = resultSet.getString("An");
+                int produse = resultSet.getInt("Produse");
+
+                orderTimeline.put(year, new Integer(produse));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, resultSet);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return orderTimeline;
+    }
+
+    public HashMap<String, Integer> getProductOrderTimeline() {
+        Connection connection = null;
+        Statement statement = null;
+        ResultSet resultSet = null;
+        HashMap<String, Integer> orderTimeline = new HashMap<String, Integer>();
+
+        try {
+            connection = connMan.openConnection();
+            String sql = "SELECT 'Filme' as Categorie, COUNT(id_film) as Produse FROM produse JOIN imprumuturi USING(id_prod) UNION " +
+                    "SELECT 'Jocuri' as Categorie, COUNT(id_joc) as Produse FROM produse JOIN imprumuturi USING(id_prod) UNION " +
+                    "SELECT 'Albume' as Categorie, COUNT(id_album) as Produse FROM produse JOIN imprumuturi USING(id_prod)";
+            statement = connection.createStatement();
+            resultSet = statement.executeQuery(sql);
+
+            while (resultSet.next()) {
+                String cat = resultSet.getString("Categorie");
+                int produse = resultSet.getInt("Produse");
+
+                orderTimeline.put(cat, new Integer(produse));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                connMan.closeConnection(connection, statement, resultSet);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return orderTimeline;
     }
 }

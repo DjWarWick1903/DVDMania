@@ -32,12 +32,19 @@ public class ExportExcel {
         return instance;
     }
 
-    public void writeStockToExcel(ArrayList<Stock> stocks, Date date) {
+    public void writeStockToExcel(ArrayList<Stock> stocks, String city) {
+        Date date = new Date();
+
         //Create Blank workbook
         XSSFWorkbook workbook = XSSFWorkbookFactory.createWorkbook();
 
         //Create a blank sheet
-        XSSFSheet spreadsheet = workbook.createSheet("Stock " + date.getDate() + "." + date.getMonth() + "." + (date.getYear() + 1900));
+        XSSFSheet spreadsheet;
+        if (city != null) {
+            spreadsheet = workbook.createSheet("Stock " + city + " " + date.getDate() + "." + date.getMonth() + "." + (date.getYear() + 1900));
+        } else {
+            spreadsheet = workbook.createSheet("Stock " + date.getDate() + "." + date.getMonth() + "." + (date.getYear() + 1900));
+        }
 
         //Create row object
         XSSFRow row;
@@ -90,7 +97,11 @@ public class ExportExcel {
         //Create file system using specific name
         FileOutputStream out = null;
         try {
-            out = new FileOutputStream(new File("Stock " + date.getDate() + "." + date.getMonth() + "." + (date.getYear() + 1900) + ".xlsx"));
+            if (city != null) {
+                out = new FileOutputStream(new File("Stock " + city + " " + date.getDate() + "." + date.getMonth() + "." + (date.getYear() + 1900) + ".xlsx"));
+            } else {
+                out = new FileOutputStream(new File("Stock " + date.getDate() + "." + date.getMonth() + "." + (date.getYear() + 1900) + ".xlsx"));
+            }
             workbook.write(out);
             System.out.println("Created Stock " + date.getDate() + "." + date.getMonth() + "." + (date.getYear() + 1900) + ".xlsx successfully");
         } catch (IOException e) {
