@@ -32,14 +32,16 @@ public final class ExportOrdersWindow extends JFrame {
         final JLabel label2 = new JLabel();
         label2.setText("La data:");
         final JTextField toDateField = new JTextField();
-        forms.add(label1);
-        forms.add(fromDateField);
-        forms.add(label2);
-        forms.add(toDateField);
         final JLabel label3 = new JLabel();
         label3.setText("Oras");
         final JComboBox comboBoxStores = new JComboBox<String>();
         comboBoxStores.addItem("Toate");
+        forms.add(label1);
+        forms.add(fromDateField);
+        forms.add(label2);
+        forms.add(toDateField);
+        forms.add(label3);
+        forms.add(comboBoxStores);
 
         final StoreManager storeMan = StoreManager.getInstance();
         final ArrayList<Store> stores = storeMan.getStores();
@@ -126,7 +128,7 @@ public final class ExportOrdersWindow extends JFrame {
 
         this.add(mainPanel);
         this.setVisible(true);
-        this.setSize(300, 150);
+        this.setSize(300, 300);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLocationRelativeTo(null);
 
