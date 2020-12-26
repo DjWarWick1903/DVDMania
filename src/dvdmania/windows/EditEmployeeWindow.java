@@ -12,9 +12,7 @@ import java.util.ArrayList;
 
 public final class EditEmployeeWindow extends JFrame {
 
-    private static EditEmployeeWindow instance = null;
-
-    private EditEmployeeWindow() {
+    public EditEmployeeWindow() {
         super();
         final EmployeeManager empMan = EmployeeManager.getInstance();
         final ArrayList<Employee> employees = empMan.getEmployees();
@@ -205,17 +203,9 @@ public final class EditEmployeeWindow extends JFrame {
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                EditEmployeeWindow.getInstance().setVisible(false);
-                EditEmployeeWindow.getInstance().dispose();
+                setVisible(false);
+                dispose();
             }
         });
-    }
-
-    public static EditEmployeeWindow getInstance() {
-        if (instance == null) {
-            instance = new EditEmployeeWindow();
-        }
-
-        return instance;
     }
 }

@@ -12,15 +12,13 @@ import java.awt.event.ActionListener;
 
 public final class EditProductWindow extends JFrame {
 
-    private static EditProductWindow instance = null;
-
     private static JPanel firstPanel, detaliiPanel, buttonPanel;
     private static JLabel editCategorieLabel, editIDLabel;
     private static JComboBox editCategorieBox;
     private static JTextField editIDField;
     private static JButton exit, proceed, saveSecond, exitSecond;
 
-    private EditProductWindow() {
+    public EditProductWindow() {
         super("Edit product");
 
         //first window
@@ -67,18 +65,10 @@ public final class EditProductWindow extends JFrame {
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                getInstance().setVisible(false);
-                getInstance().dispose();
+                setVisible(false);
+                dispose();
             }
         });
-    }
-
-    public static EditProductWindow getInstance() {
-        if (instance == null) {
-            instance = new EditProductWindow();
-        }
-
-        return instance;
     }
 
     private void movieWindow() {

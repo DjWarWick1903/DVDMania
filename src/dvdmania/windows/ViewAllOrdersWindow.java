@@ -13,9 +13,7 @@ import java.util.ArrayList;
 
 public class ViewAllOrdersWindow extends JFrame {
 
-    private static ViewAllOrdersWindow instance = null;
-
-    private ViewAllOrdersWindow() {
+    public ViewAllOrdersWindow() {
         super();
 
         final OrderManager orderMan = OrderManager.getInstance();
@@ -84,17 +82,9 @@ public class ViewAllOrdersWindow extends JFrame {
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ViewAllOrdersWindow.getInstance().setVisible(false);
-                ViewAllOrdersWindow.getInstance().dispose();
+                setVisible(false);
+                dispose();
             }
         });
-    }
-
-    public static ViewAllOrdersWindow getInstance() {
-        if (instance == null) {
-            instance = new ViewAllOrdersWindow();
-        }
-
-        return instance;
     }
 }

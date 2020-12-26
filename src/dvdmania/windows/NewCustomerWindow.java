@@ -13,77 +13,64 @@ import java.time.LocalDate;
 
 public final class NewCustomerWindow extends JFrame {
 
-    //window instance
-    private static NewCustomerWindow instance = null;
-
-    //window variables
-    private static JPasswordField newPasswordText;
-    private static JPanel newDataPanel, newBirthPanel, newButtonPanel, newMainPanel;
-    private static JButton newCreateButton, newCancelButton;
-    private static JLabel newUserLabel, newPasswordLabel, newEmailLabel, newNameLabel, newPrenLabel,
-            newAddressLabel, newCityLabel, newCNPLabel, newTelLabel, newBirthYearLabel, newBirthMonthLabel,
-            newBirthDayLabel;
-    private static JTextField newUsernameText, newEmailText, newNameText, newPrenText, newAddressText, newCityText,
-            newCNPText, newTelText, newBirthYearText, newBirthMonthText, newBirthDayText;
-
-    private NewCustomerWindow() {
+    public NewCustomerWindow() {
         super("New customer");
 
         //Username
-        newUserLabel = new JLabel();
+        final JLabel newUserLabel = new JLabel();
         newUserLabel.setText("Username: ");
-        newUsernameText = new JTextField();
+        final JTextField newUsernameText = new JTextField();
 
         //Password
-        newPasswordLabel = new JLabel();
+        final JLabel newPasswordLabel = new JLabel();
         newPasswordLabel.setText("Password: ");
-        newPasswordText = new JPasswordField();
+        final JPasswordField newPasswordText = new JPasswordField();
 
         //Email
-        newEmailLabel = new JLabel();
+        final JLabel newEmailLabel = new JLabel();
         newEmailLabel.setText("Email: ");
-        newEmailText = new JTextField();
+        final JTextField newEmailText = new JTextField();
 
         //First Name
-        newNameLabel = new JLabel();
+        final JLabel newNameLabel = new JLabel();
         newNameLabel.setText("Nume: ");
-        newNameText = new JTextField();
+        final JTextField newNameText = new JTextField();
 
         //Last Name
-        newPrenLabel = new JLabel();
+        final JLabel newPrenLabel = new JLabel();
         newPrenLabel.setText("Prenume: ");
-        newPrenText = new JTextField();
+        final JTextField newPrenText = new JTextField();
 
         //Address
-        newAddressLabel = new JLabel();
+        final JLabel newAddressLabel = new JLabel();
         newAddressLabel.setText("Address: ");
-        newAddressText = new JTextField();
+        final JTextField newAddressText = new JTextField();
 
         //City
-        newCityLabel = new JLabel();
+        final JLabel newCityLabel = new JLabel();
         newCityLabel.setText("City: ");
-        newCityText = new JTextField();
+        final JTextField newCityText = new JTextField();
 
         //CNP
-        newCNPLabel = new JLabel();
+        final JLabel newCNPLabel = new JLabel();
         newCNPLabel.setText("CNP: ");
-        newCNPText = new JTextField();
+        final JTextField newCNPText = new JTextField();
 
         //Phone
-        newTelLabel = new JLabel();
+        final JLabel newTelLabel = new JLabel();
         newTelLabel.setText("Phone: ");
-        newTelText = new JTextField();
+        final JTextField newTelText = new JTextField();
 
         //Birthday
-        newBirthYearLabel = new JLabel("Year(yyyy)");
-        newBirthMonthLabel = new JLabel("Month(mm)");
-        newBirthDayLabel = new JLabel("Day(dd)");
-        newBirthYearText = new JTextField();
-        newBirthMonthText = new JTextField();
-        newBirthDayText = new JTextField();
+        final JLabel newBirthYearLabel = new JLabel("Year(yyyy)");
+        final JLabel newBirthMonthLabel = new JLabel("Month(mm)");
+        final JLabel newBirthDayLabel = new JLabel("Day(dd)");
+        final JTextField newBirthYearText = new JTextField();
+        final JTextField newBirthMonthText = new JTextField();
+        final JTextField newBirthDayText = new JTextField();
 
         //Data panel
-        newDataPanel = new JPanel(new GridLayout(9, 2, 5, 5));
+        final JPanel newDataPanel = new JPanel(new GridLayout(9, 2, 5, 5));
         newDataPanel.add(newUserLabel);
         newDataPanel.add(newUsernameText);
         newDataPanel.add(newPasswordLabel);
@@ -104,7 +91,7 @@ public final class NewCustomerWindow extends JFrame {
         newDataPanel.add(newTelText);
 
         //Birth Panel
-        newBirthPanel = new JPanel(new GridLayout(2, 3, 5, 5));
+        final JPanel newBirthPanel = new JPanel(new GridLayout(2, 3, 5, 5));
         newBirthPanel.add(newBirthYearLabel);
         newBirthPanel.add(newBirthMonthLabel);
         newBirthPanel.add(newBirthDayLabel);
@@ -113,14 +100,14 @@ public final class NewCustomerWindow extends JFrame {
         newBirthPanel.add(newBirthDayText);
 
         //Button Panel
-        newButtonPanel = new JPanel(new GridLayout(1, 2, 5, 5));
-        newCreateButton = new JButton("Create");
-        newCancelButton = new JButton("Cancel");
+        final JPanel newButtonPanel = new JPanel(new GridLayout(1, 2, 5, 5));
+        final JButton newCreateButton = new JButton("Create");
+        final JButton newCancelButton = new JButton("Cancel");
         newButtonPanel.add(newCreateButton);
         newButtonPanel.add(newCancelButton);
 
         //dvdmania.tools.Main Panel
-        newMainPanel = new JPanel(new BorderLayout());
+        final JPanel newMainPanel = new JPanel(new BorderLayout());
         newMainPanel.add(newDataPanel, BorderLayout.NORTH);
         newMainPanel.add(newBirthPanel, BorderLayout.CENTER);
         newMainPanel.add(newButtonPanel, BorderLayout.SOUTH);
@@ -136,8 +123,8 @@ public final class NewCustomerWindow extends JFrame {
                 final JFrame dialogFrame = new JFrame();
                 final int dialogResult = JOptionPane.showConfirmDialog(dialogFrame, "Are you sure?", "Exiting", JOptionPane.YES_NO_OPTION);
                 if (dialogResult == JOptionPane.YES_OPTION) {
-                    getInstance().setVisible(false);
-                    getInstance().dispose();
+                    setVisible(false);
+                    dispose();
                 }
             }
         });
@@ -190,13 +177,5 @@ public final class NewCustomerWindow extends JFrame {
                 }
             }
         });
-    }
-
-    public static NewCustomerWindow getInstance() {
-        if (instance == null) {
-            instance = new NewCustomerWindow();
-        }
-
-        return instance;
     }
 }

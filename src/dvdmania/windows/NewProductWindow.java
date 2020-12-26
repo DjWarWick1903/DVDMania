@@ -14,11 +14,9 @@ import java.util.Iterator;
 
 public final class NewProductWindow extends JFrame {
 
-    private static NewProductWindow instance = null;
     private static JButton newFilm, newJoc, newAlbum, newSong, exit;
-    private static JPanel newProductButtons, newProductMain;
 
-    private NewProductWindow() {
+    public NewProductWindow() {
         super("Produs nou");
 
         //creare butoane
@@ -29,13 +27,13 @@ public final class NewProductWindow extends JFrame {
         exit = new JButton("Exit");
 
         //creare fereastra principala
-        newProductButtons = new JPanel(new GridLayout(2, 2, 2, 2));
+        final JPanel newProductButtons = new JPanel(new GridLayout(2, 2, 2, 2));
         newProductButtons.add(newFilm);
         newProductButtons.add(newJoc);
         newProductButtons.add(newAlbum);
         newProductButtons.add(newSong);
 
-        newProductMain = new JPanel(new BorderLayout());
+        final JPanel newProductMain = new JPanel(new BorderLayout());
         newProductMain.add(newProductButtons, BorderLayout.CENTER);
         newProductMain.add(exit, BorderLayout.SOUTH);
 
@@ -53,18 +51,10 @@ public final class NewProductWindow extends JFrame {
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                getInstance().setVisible(false);
-                getInstance().dispose();
+                setVisible(false);
+                dispose();
             }
         });
-    }
-
-    public static NewProductWindow getInstance() {
-        if (instance == null) {
-            instance = new NewProductWindow();
-        }
-
-        return instance;
     }
 
     private void setMovieListener() {

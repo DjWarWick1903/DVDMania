@@ -17,9 +17,7 @@ import java.util.Iterator;
 
 public final class FinishOrderWindow extends JFrame {
 
-    private static FinishOrderWindow instance = null;
-
-    private FinishOrderWindow() {
+    public FinishOrderWindow() {
         super();
 
         final OrderManager orderMan = OrderManager.getInstance();
@@ -103,17 +101,9 @@ public final class FinishOrderWindow extends JFrame {
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                FinishOrderWindow.getInstance().setVisible(false);
-                FinishOrderWindow.getInstance().dispose();
+                setVisible(false);
+                dispose();
             }
         });
-    }
-
-    public static FinishOrderWindow getInstance() {
-        if (instance == null) {
-            instance = new FinishOrderWindow();
-        }
-
-        return instance;
     }
 }

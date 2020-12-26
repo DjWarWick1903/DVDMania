@@ -14,7 +14,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-
 public class GUI extends JFrame {
 
     private static GUI instance = null;
@@ -437,7 +436,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    NewProductWindow.getInstance();
+                    final NewProductWindow window = new NewProductWindow();
                 }
             }
         });
@@ -449,7 +448,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    ExportOrdersWindow exportWindow = ExportOrdersWindow.getInstance();
+                    final ExportOrdersWindow exportWindow = new ExportOrdersWindow();
                 }
             }
         });
@@ -461,7 +460,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    ExportStockWindow stockWindow = ExportStockWindow.getInstance();
+                    final ExportStockWindow stockWindow = new ExportStockWindow();
                 }
             }
         });
@@ -473,7 +472,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    EditProductWindow.getInstance();
+                    final EditProductWindow window = new EditProductWindow();
                 }
             }
         });
@@ -485,7 +484,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    NewCustomerWindow.getInstance();
+                    final NewCustomerWindow window = new NewCustomerWindow();
                 }
             }
         });
@@ -497,7 +496,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    EditCustomerWindow.getInstance();
+                    final EditCustomerWindow window = new EditCustomerWindow();
                 }
             }
         });
@@ -509,7 +508,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    NewEmployeeWindow.getInstance();
+                    final NewEmployeeWindow window = new NewEmployeeWindow();
                 }
             }
         });
@@ -521,7 +520,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    EditEmployeeWindow.getInstance();
+                    final EditEmployeeWindow window = new EditEmployeeWindow();
                 }
             }
         });
@@ -533,7 +532,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    NewStoreWindow.getInstance();
+                    final NewStoreWindow window = new NewStoreWindow();
                 }
             }
         });
@@ -545,7 +544,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    EditStoreWindow.getInstance();
+                    final EditStoreWindow window = new EditStoreWindow();
                 }
             }
         });
@@ -557,7 +556,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    NewOrderWindow.getInstance();
+                    final NewOrderWindow window = new NewOrderWindow();
                 }
             }
         });
@@ -569,7 +568,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    FinishOrderWindow.getInstance();
+                    final FinishOrderWindow window = new FinishOrderWindow();
                 }
             }
         });
@@ -581,7 +580,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    ViewAllOrdersWindow.getInstance();
+                    final ViewAllOrdersWindow window = new ViewAllOrdersWindow();
                 }
             }
         });
@@ -589,7 +588,7 @@ public class GUI extends JFrame {
         viewAccountDetails.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ViewAccountWindow.getInstance();
+                final ViewAccountWindow window = new ViewAccountWindow();
             }
         });
 
@@ -600,7 +599,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    SaleChartWindow.getInstance();
+                    final SaleChartWindow window = new SaleChartWindow();
                 }
             }
         });
@@ -612,7 +611,7 @@ public class GUI extends JFrame {
                     final JFrame dialog = new JFrame();
                     JOptionPane.showMessageDialog(dialog, "You do not have permission to use this function!", "Warning", JOptionPane.WARNING_MESSAGE);
                 } else {
-                    ProductChartWindow.getInstance();
+                    final ProductChartWindow window = new ProductChartWindow();
                 }
             }
         });

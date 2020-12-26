@@ -12,9 +12,7 @@ import java.util.ArrayList;
 
 public final class EditStoreWindow extends JFrame {
 
-    private static EditStoreWindow instance = null;
-
-    private EditStoreWindow() {
+    public EditStoreWindow() {
         super();
 
         final StoreManager storeMan = StoreManager.getInstance();
@@ -135,17 +133,9 @@ public final class EditStoreWindow extends JFrame {
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                EditStoreWindow.getInstance().setVisible(false);
-                EditStoreWindow.getInstance().dispose();
+                setVisible(false);
+                dispose();
             }
         });
-    }
-
-    public static EditStoreWindow getInstance() {
-        if (instance == null) {
-            instance = new EditStoreWindow();
-        }
-
-        return instance;
     }
 }

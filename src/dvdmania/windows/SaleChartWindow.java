@@ -13,9 +13,7 @@ import java.util.Set;
 
 public final class SaleChartWindow extends JFrame {
 
-    private static SaleChartWindow instance = null;
-
-    private SaleChartWindow() {
+    public SaleChartWindow() {
         super("Order chart");
         final JFreeChart lineChart = ChartFactory.createLineChart(
                 "Imprumuturi pe ani",
@@ -32,14 +30,6 @@ public final class SaleChartWindow extends JFrame {
         this.setVisible(true);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLocationRelativeTo(null);
-    }
-
-    public static SaleChartWindow getInstance() {
-        if (instance == null) {
-            instance = new SaleChartWindow();
-        }
-
-        return instance;
     }
 
     private DefaultCategoryDataset createDataset() {

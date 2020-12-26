@@ -14,26 +14,19 @@ import java.util.ArrayList;
 
 public final class ExportStockWindow extends JFrame {
 
-    private static ExportStockWindow instance = null;
-
-    private static JComboBox<String> comboBoxStores;
-    private static JButton exitButton, exportButton;
-    private static JLabel label1;
-    private static JPanel mainPanel, formPanel, buttonPanel;
-
-    private ExportStockWindow() {
+    public ExportStockWindow() {
         super();
 
         //create main panel
-        mainPanel = new JPanel();
+        final JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new BorderLayout());
 
         //create and build form panel
-        formPanel = new JPanel();
+        final JPanel formPanel = new JPanel();
         formPanel.setLayout(new GridLayout(2, 1));
-        label1 = new JLabel();
+        final JLabel label1 = new JLabel();
         label1.setText("Oras");
-        comboBoxStores = new JComboBox<String>();
+        final JComboBox comboBoxStores = new JComboBox<String>();
         comboBoxStores.addItem("Toate");
 
         final StoreManager storeMan = StoreManager.getInstance();
@@ -47,12 +40,12 @@ public final class ExportStockWindow extends JFrame {
         formPanel.add(comboBoxStores);
 
         //create and build button panel
-        buttonPanel = new JPanel();
+        final JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new GridLayout(1, 2));
 
-        exitButton = new JButton();
+        final JButton exitButton = new JButton();
         exitButton.setText("Inapoi");
-        exportButton = new JButton();
+        final JButton exportButton = new JButton();
         exportButton.setText("Export");
 
         buttonPanel.add(exitButton);
@@ -65,7 +58,7 @@ public final class ExportStockWindow extends JFrame {
         exitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                ExportStockWindow.getInstance().dispose();
+                dispose();
             }
         });
 
@@ -94,13 +87,5 @@ public final class ExportStockWindow extends JFrame {
         this.setSize(300, 150);
         this.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         this.setLocationRelativeTo(null);
-    }
-
-    public static ExportStockWindow getInstance() {
-        if (instance == null) {
-            instance = new ExportStockWindow();
-        }
-
-        return instance;
     }
 }

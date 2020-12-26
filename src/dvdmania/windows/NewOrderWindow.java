@@ -12,9 +12,8 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 
 public final class NewOrderWindow extends JFrame {
-    private static NewOrderWindow instance = null;
 
-    private NewOrderWindow() {
+    public NewOrderWindow() {
         super();
 
         final ClientManager clientMan = ClientManager.getInstance();
@@ -200,17 +199,9 @@ public final class NewOrderWindow extends JFrame {
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                NewOrderWindow.getInstance().setVisible(false);
-                NewOrderWindow.getInstance().dispose();
+                setVisible(false);
+                dispose();
             }
         });
-    }
-
-    public static NewOrderWindow getInstance() {
-        if (instance == null) {
-            instance = new NewOrderWindow();
-        }
-
-        return instance;
     }
 }

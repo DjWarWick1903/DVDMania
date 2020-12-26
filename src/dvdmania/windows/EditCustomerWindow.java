@@ -14,9 +14,7 @@ import java.util.ArrayList;
 
 public class EditCustomerWindow extends JFrame {
 
-    private static EditCustomerWindow instance = null;
-
-    private EditCustomerWindow() {
+    public EditCustomerWindow() {
         final ClientManager clientMan = ClientManager.getInstance();
         final ArrayList<Client> customers = clientMan.getAllClients();
         final JTable table = new JTable();
@@ -184,13 +182,5 @@ public class EditCustomerWindow extends JFrame {
                 firstWindow.dispose();
             }
         });
-    }
-
-    public static EditCustomerWindow getInstance() {
-        if (instance == null) {
-            instance = new EditCustomerWindow();
-        }
-
-        return instance;
     }
 }

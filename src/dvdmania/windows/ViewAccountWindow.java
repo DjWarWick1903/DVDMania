@@ -10,9 +10,7 @@ import java.awt.event.ActionListener;
 
 public final class ViewAccountWindow extends JFrame {
 
-    private static ViewAccountWindow instance = null;
-
-    private ViewAccountWindow() {
+    public ViewAccountWindow() {
         super();
 
         if (GUI.getPriv() == 1) {
@@ -57,8 +55,8 @@ public final class ViewAccountWindow extends JFrame {
             exit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    ViewAccountWindow.getInstance().setVisible(false);
-                    ViewAccountWindow.getInstance().dispose();
+                    setVisible(false);
+                    dispose();
                 }
             });
         } else if (GUI.getPriv() != 0) {
@@ -103,21 +101,13 @@ public final class ViewAccountWindow extends JFrame {
             exit.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    ViewAccountWindow.getInstance().setVisible(false);
-                    ViewAccountWindow.getInstance().dispose();
+                    setVisible(false);
+                    dispose();
                 }
             });
         } else {
             final JFrame dialog = new JFrame();
             JOptionPane.showMessageDialog(dialog, "Sunteti logat ca si musafir. Creati mai intai un cont personal!", "Warning", JOptionPane.WARNING_MESSAGE);
         }
-    }
-
-    public static ViewAccountWindow getInstance() {
-        if (instance == null) {
-            instance = new ViewAccountWindow();
-        }
-
-        return instance;
     }
 }

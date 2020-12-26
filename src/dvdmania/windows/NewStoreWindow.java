@@ -10,9 +10,7 @@ import java.awt.event.ActionListener;
 
 public final class NewStoreWindow extends JFrame {
 
-    private static NewStoreWindow instance = null;
-
-    private NewStoreWindow() {
+    public NewStoreWindow() {
         super();
 
         final JLabel newAdresaLabel, newOrasLabel, newTelLabel;
@@ -75,17 +73,9 @@ public final class NewStoreWindow extends JFrame {
         exit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                NewStoreWindow.getInstance().setVisible(false);
-                NewStoreWindow.getInstance().dispose();
+                setVisible(false);
+                dispose();
             }
         });
-    }
-
-    public static NewStoreWindow getInstance() {
-        if (instance == null) {
-            instance = new NewStoreWindow();
-        }
-
-        return instance;
     }
 }
