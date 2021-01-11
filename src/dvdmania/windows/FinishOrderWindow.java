@@ -1,6 +1,7 @@
 package dvdmania.windows;
 
 import dvdmania.management.ClientManager;
+import dvdmania.management.LogManager;
 import dvdmania.management.Store;
 import dvdmania.management.StoreManager;
 import dvdmania.products.Order;
@@ -94,6 +95,8 @@ public final class FinishOrderWindow extends JFrame {
                         final JFrame dialog = new JFrame();
                         JOptionPane.showMessageDialog(dialog, "Atentie! Clientul nu a adus produsul la timp!", "Warning", JOptionPane.WARNING_MESSAGE);
                     }
+
+                    LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Finished order with id " + order.getStock().getIdProduct() + " for client with id " + order.getClient().getId() + " started on date " + order.getBorrowDate());
                 }
             }
         });

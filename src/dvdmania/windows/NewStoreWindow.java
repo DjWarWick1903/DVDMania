@@ -1,5 +1,6 @@
 package dvdmania.windows;
 
+import dvdmania.management.LogManager;
 import dvdmania.management.Store;
 import dvdmania.management.StoreManager;
 
@@ -65,6 +66,7 @@ public final class NewStoreWindow extends JFrame {
                         final Store store = new Store(0, adresa, oras, tel);
                         final StoreManager storeMan = StoreManager.getInstance();
                         storeMan.createStore(store);
+                        LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Created new store with id " + store.getId());
                     }
                 }
             }

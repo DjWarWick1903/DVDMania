@@ -69,7 +69,6 @@ public class GUI extends JFrame {
     static ArrayList<Store> mainStoresList;
 
     private void LoginPanel() {
-
         //Username
         final JLabel logUserLabel = new JLabel();
         logUserLabel.setText("Username: ");
@@ -136,6 +135,8 @@ public class GUI extends JFrame {
                         JOptionPane.showMessageDialog(welcomeDialog, "Welcome, " + client.getNume() + " " + client.getPrenume() + "!", "Client", JOptionPane.INFORMATION_MESSAGE);
                     } else if (employee != null) {
                         JOptionPane.showMessageDialog(welcomeDialog, "Welcome, " + employee.getNume() + " " + employee.getPrenume() + "!", "Angajat", JOptionPane.INFORMATION_MESSAGE);
+                        final LogManager logMan = LogManager.getInstance();
+                        logMan.insertLog(employee, "Logged in.");
                     }
 
                     setVisible(false);
@@ -668,7 +669,7 @@ public class GUI extends JFrame {
         mainSearchPanel.add(mainScrollPane, BorderLayout.CENTER);
         mainSearchPanel.add(mainCheckButton, BorderLayout.SOUTH);
 
-        //dvdmania.tools.Main Panel
+        //Main Panel
         mainMainPanel = new JPanel();
         mainMainPanel.setLayout(new BorderLayout());
         mainMainPanel.add(mainSearchPanel, BorderLayout.CENTER);

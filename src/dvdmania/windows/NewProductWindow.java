@@ -1,5 +1,6 @@
 package dvdmania.windows;
 
+import dvdmania.management.LogManager;
 import dvdmania.management.StockManager;
 import dvdmania.management.Store;
 import dvdmania.management.StoreManager;
@@ -148,6 +149,7 @@ public final class NewProductWindow extends JFrame {
 
                             movieMan.createMovie(movie);
                             stockMan.insertMovieStock(movie, store, Integer.parseInt(cant), Integer.parseInt(pret));
+                            LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Created movie stock for " + movie.getTitle() + " in store with id " + store.getId());
                         }
                     }
                 });
@@ -251,6 +253,7 @@ public final class NewProductWindow extends JFrame {
 
                             gameMan.createGame(game);
                             stockMan.insertGameStock(game, store, Integer.parseInt(cant), Integer.parseInt(pret));
+                            LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Inserted game stock for game " + game.getTitle() + " in store with id " + store.getId());
                         }
                     }
                 });
@@ -351,6 +354,7 @@ public final class NewProductWindow extends JFrame {
 
                             albumMan.createAlbum(album);
                             stockMan.insertAlbumStock(album, store, Integer.parseInt(cant), Integer.parseInt(pret));
+                            LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Inserted album stock for album " + album.getTitle() + " in store with id " + store.getId());
                         }
                     }
                 });
@@ -431,6 +435,7 @@ public final class NewProductWindow extends JFrame {
                                 if (album.getTitle().equals(albumName)) {
                                     final Song song = new Song(0, nume, Integer.parseInt(durata));
                                     songMan.CreateSong(album, song);
+                                    LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Created song " + song.getNume() + " for album " + album.getTitle());
                                     break;
                                 }
                             }

@@ -3,6 +3,7 @@ package dvdmania.windows;
 import dvdmania.management.AccountManager;
 import dvdmania.management.Client;
 import dvdmania.management.ClientManager;
+import dvdmania.management.LogManager;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -160,6 +161,8 @@ public class EditCustomerWindow extends JFrame {
 
                                 accMan.updateClientAccount(client.getAccount());
                                 clientMan.updateClient(client);
+
+                                LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Edited data for client with id " + client.getId());
                             }
                         }
                     });

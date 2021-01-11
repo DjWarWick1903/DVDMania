@@ -1,5 +1,6 @@
 package dvdmania.windows;
 
+import dvdmania.management.LogManager;
 import dvdmania.management.Store;
 import dvdmania.management.StoreManager;
 
@@ -115,6 +116,9 @@ public final class EditStoreWindow extends JFrame {
                                 store.setTelefon(magTelField.getText());
 
                                 storeMan.updateStore(store);
+
+                                LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Edited data for store with id " + store.getId());
+
                             }
                         }
                     });

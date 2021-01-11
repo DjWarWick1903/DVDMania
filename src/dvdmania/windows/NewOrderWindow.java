@@ -110,6 +110,8 @@ public final class NewOrderWindow extends JFrame {
                                                 final LocalDate dataRet = orderMan.checkOutMovieOrder(movie, client, GUI.getLoggedEmployee());
                                                 final JFrame dialog = new JFrame();
                                                 JOptionPane.showMessageDialog(dialog, "Produsul a fost inchiriat! Aceste trebuie returnat pana in data de " + dataRet, "Succes", JOptionPane.WARNING_MESSAGE);
+                                                LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Rented movie to client with id " + client.getId());
+
                                             } else {
                                                 final JFrame dialog = new JFrame();
                                                 JOptionPane.showMessageDialog(dialog, "Produsul nu a fost inchiriat deoarece a aparut o problema. Incercati din nou!", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -139,6 +141,7 @@ public final class NewOrderWindow extends JFrame {
                                                 final LocalDate dataRet = orderMan.checkOutGameOrder(game, client, GUI.getLoggedEmployee());
                                                 final JFrame dialog = new JFrame();
                                                 JOptionPane.showMessageDialog(dialog, "Produsul a fost inchiriat! Aceste trebuie returnat pana in data de " + dataRet, "Succes", JOptionPane.WARNING_MESSAGE);
+                                                LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Rented game to client with id " + client.getId());
                                             } else {
                                                 final JFrame dialog = new JFrame();
                                                 JOptionPane.showMessageDialog(dialog, "Produsul nu a fost inchiriat deoarece a aparut o problema. Incercati din nou!", "Warning", JOptionPane.WARNING_MESSAGE);
@@ -167,6 +170,7 @@ public final class NewOrderWindow extends JFrame {
                                                 final LocalDate dataRet = orderMan.checkOutAlbumOrder(album, client, GUI.getLoggedEmployee());
                                                 final JFrame dialog = new JFrame();
                                                 JOptionPane.showMessageDialog(dialog, "Produsul a fost inchiriat! Aceste trebuie returnat pana in data de " + dataRet, "Succes", JOptionPane.WARNING_MESSAGE);
+                                                LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Rented album to client with id " + client.getId());
                                             } else {
                                                 final JFrame dialog = new JFrame();
                                                 JOptionPane.showMessageDialog(dialog, "Produsul nu a fost inchiriat deoarece a aparut o problema. Incercati din nou!", "Warning", JOptionPane.WARNING_MESSAGE);

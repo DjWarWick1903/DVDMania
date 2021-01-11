@@ -1,5 +1,6 @@
 package dvdmania.windows;
 
+import dvdmania.management.LogManager;
 import dvdmania.management.Store;
 import dvdmania.management.StoreManager;
 import dvdmania.products.Order;
@@ -96,6 +97,8 @@ public final class ExportOrdersWindow extends JFrame {
                         if (toDate1 != null) {
                             final ArrayList<Order> orders = ordMan.getOrdersByDates(null, toDate1, selectedStore);
                             excel.writeOrdersToExcel(orders);
+                            LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Exported data for orders ");
+
                         } else {
                             final JFrame warningDialog = new JFrame();
                             JOptionPane.showMessageDialog(warningDialog, "Date format not correct! Use yyyy/MM/dd format.", "Error", JOptionPane.WARNING_MESSAGE);
@@ -107,6 +110,8 @@ public final class ExportOrdersWindow extends JFrame {
                         if (fromDate1 != null) {
                             final ArrayList<Order> orders = ordMan.getOrdersByDates(fromDate1, null, selectedStore);
                             excel.writeOrdersToExcel(orders);
+                            LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Exported data for orders");
+
                         } else {
                             final JFrame warningDialog = new JFrame();
                             JOptionPane.showMessageDialog(warningDialog, "Date format not correct! Use yyyy/MM/dd format.", "Error", JOptionPane.WARNING_MESSAGE);
@@ -117,6 +122,8 @@ public final class ExportOrdersWindow extends JFrame {
                         if (fromDate1 != null && toDate1 != null) {
                             final ArrayList<Order> orders = ordMan.getOrdersByDates(fromDate1, toDate1, selectedStore);
                             excel.writeOrdersToExcel(orders);
+                            LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Exported data for orders");
+
                         } else {
                             final JFrame warningDialog = new JFrame();
                             JOptionPane.showMessageDialog(warningDialog, "Date format not correct! Use yyyy/MM/dd format.", "Error", JOptionPane.WARNING_MESSAGE);

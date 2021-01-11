@@ -7,11 +7,9 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-//TODO: create getAllStock and getAllStock(Store) methods
-
 public class StockManager {
 
-    ConnectionManager connMan = ConnectionManager.getInstance();
+    private final ConnectionManager connMan = ConnectionManager.getInstance();
     private static StockManager instance = null;
 
     private StockManager() {
@@ -29,11 +27,11 @@ public class StockManager {
         Connection connection = null;
         Statement statement = null;
         ResultSet result = null;
-        ArrayList<Stock> stockList = new ArrayList<>();
+        final ArrayList<Stock> stockList = new ArrayList<>();
 
         try {
             connection = connMan.openConnection();
-            String sql = "SELECT id_prod, id_film, id_joc, id_album, id_mag, cant, pret FROM produse";
+            final String sql = "SELECT id_prod, id_film, id_joc, id_album, id_mag, cant, pret FROM produse";
             statement = connection.createStatement();
             result = statement.executeQuery(sql);
 
@@ -46,7 +44,7 @@ public class StockManager {
                 int quantity = result.getInt("cant");
                 int price = result.getInt("pret");
 
-                Stock stock = new Stock();
+                final Stock stock = new Stock();
                 stock.setIdProduct(idStock);
                 stock.setQuantity(quantity);
                 stock.setPrice(price);
@@ -62,7 +60,7 @@ public class StockManager {
                     stock.setAlbum(albumMan.getAlbumById(idAlbum));
                 }
 
-                StoreManager storeMan = StoreManager.getInstance();
+                final StoreManager storeMan = StoreManager.getInstance();
                 stock.setStore(storeMan.getStoreById(idStore));
 
                 stockList.add(stock);
@@ -84,11 +82,11 @@ public class StockManager {
         Connection connection = null;
         PreparedStatement statement = null;
         ResultSet result = null;
-        ArrayList<Stock> stockList = new ArrayList<>();
+        final ArrayList<Stock> stockList = new ArrayList<>();
 
         try {
             connection = connMan.openConnection();
-            String sql = "SELECT id_prod, id_film, id_joc, id_album, cant, pret FROM produse WHERE id_mag=?";
+            final String sql = "SELECT id_prod, id_film, id_joc, id_album, cant, pret FROM produse WHERE id_mag=?";
             statement = connection.prepareStatement(sql);
             statement.setInt(1, store.getId());
             result = statement.executeQuery();
@@ -101,19 +99,19 @@ public class StockManager {
                 int quantity = result.getInt("cant");
                 int price = result.getInt("pret");
 
-                Stock stock = new Stock();
+                final Stock stock = new Stock();
                 stock.setIdProduct(idStock);
                 stock.setQuantity(quantity);
                 stock.setPrice(price);
 
                 if (idMovie != 0) {
-                    MovieManager movieMan = MovieManager.getInstance();
+                    final MovieManager movieMan = MovieManager.getInstance();
                     stock.setMovie(movieMan.getMovieById(idMovie));
                 } else if (idGame != 0) {
-                    GameManager gameMan = GameManager.getInstance();
+                    final GameManager gameMan = GameManager.getInstance();
                     stock.setGame(gameMan.getGameById(idGame));
                 } else if (idAlbum != 0) {
-                    AlbumManager albumMan = AlbumManager.getInstance();
+                    final AlbumManager albumMan = AlbumManager.getInstance();
                     stock.setAlbum(albumMan.getAlbumById(idAlbum));
                 }
 
@@ -191,11 +189,11 @@ public class StockManager {
         Connection connection = null;
         Statement statement = null;
         ResultSet result = null;
-        ArrayList<Stock> stockList = new ArrayList<>();
+        final ArrayList<Stock> stockList = new ArrayList<>();
 
         try {
             connection = connMan.openConnection();
-            String sql = "SELECT id_prod, id_film, id_mag, cant, pret FROM produse WHERE id_film IS NOT NULL";
+            final String sql = "SELECT id_prod, id_film, id_mag, cant, pret FROM produse WHERE id_film IS NOT NULL";
             statement = connection.createStatement();
             result = statement.executeQuery(sql);
 
@@ -206,14 +204,14 @@ public class StockManager {
                 int quantity = result.getInt("cant");
                 int price = result.getInt("pret");
 
-                Stock stock = new Stock();
+                final Stock stock = new Stock();
                 stock.setIdProduct(idStock);
                 stock.setQuantity(quantity);
                 stock.setPrice(price);
-                Movie movie = new Movie();
+                final Movie movie = new Movie();
                 movie.setIdMovie(idMovie);
                 stock.setMovie(movie);
-                Store store = new Store();
+                final Store store = new Store();
                 store.setId(idStore);
                 stock.setStore(store);
 
@@ -231,10 +229,10 @@ public class StockManager {
 
         Iterator iter = stockList.iterator();
         while (iter.hasNext()) {
-            Stock stock = (Stock) iter.next();
-            MovieManager movieMan = MovieManager.getInstance();
+            final Stock stock = (Stock) iter.next();
+            final MovieManager movieMan = MovieManager.getInstance();
             stock.setMovie(movieMan.getMovieById(stock.getMovie().getIdMovie()));
-            StoreManager storeMan = StoreManager.getInstance();
+            final StoreManager storeMan = StoreManager.getInstance();
             stock.setStore(storeMan.getStoreById(stock.getStore().getId()));
         }
 

@@ -1,5 +1,6 @@
 package dvdmania.windows;
 
+import dvdmania.management.LogManager;
 import dvdmania.management.Stock;
 import dvdmania.management.StockManager;
 import dvdmania.management.Store;
@@ -180,6 +181,9 @@ public final class EditProductWindow extends JFrame {
 
                         movieMan.updateMovie(movie);
                         stockMan.updateMovieStock(movie, stock.getStore(), stock.getQuantity(), stock.getPrice());
+
+                        LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Edited data for movie with id " + movie.getIdMovie() + " in store with id " + stock.getStore().getId());
+
                     }
                 }
             });
@@ -193,6 +197,9 @@ public final class EditProductWindow extends JFrame {
                         stockMan.deleteMovieStock(stock.getMovie(), stock.getStore());
                         secondWindow.setVisible(false);
                         secondWindow.dispose();
+
+                        LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Deleted data for movie with id " + stock.getMovie().getIdMovie() + " in store with id " + stock.getStore().getId());
+
                     }
                 }
             });
@@ -315,6 +322,9 @@ public final class EditProductWindow extends JFrame {
 
                         gameMan.updateGame(game);
                         stockMan.updateGameStock(game, stock.getStore(), stock.getQuantity(), stock.getPrice());
+
+                        LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Edited data for game with id " + game.getIdGame() + " in store with id " + stock.getStore().getId());
+
                     }
                 }
             });
@@ -328,6 +338,9 @@ public final class EditProductWindow extends JFrame {
                         stockMan.deleteGameStock(stock.getGame(), stock.getStore());
                         secondWindow.setVisible(false);
                         secondWindow.dispose();
+
+                        LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Deleted data for game with id " + stock.getGame().getIdGame() + " in store with id " + stock.getStore().getId());
+
                     }
                 }
             });
@@ -445,6 +458,9 @@ public final class EditProductWindow extends JFrame {
 
                         albumMan.updateAlbum(album);
                         stockMan.updateAlbumStock(album, stock.getStore(), stock.getQuantity(), stock.getPrice());
+
+                        LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Edited data for album with id " + album.getIdAlbum() + " in store with id " + stock.getStore().getId());
+
                     }
                 }
             });
@@ -458,6 +474,9 @@ public final class EditProductWindow extends JFrame {
                         stockMan.deleteAlbumStock(stock.getAlbum(), stock.getStore());
                         secondWindow.setVisible(false);
                         secondWindow.dispose();
+
+                        LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Deleted data for album with id " + stock.getAlbum().getIdAlbum() + " in store with id " + stock.getStore().getId());
+
                     }
                 }
             });

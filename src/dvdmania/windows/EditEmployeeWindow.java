@@ -185,6 +185,8 @@ public final class EditEmployeeWindow extends JFrame {
                                 final Account account = new Account(0, empUserField.getText(), empPassField.getText(), null, 0, emp.getIdEmp());
                                 final AccountManager accMan = AccountManager.getInstance();
                                 accMan.updateEmployeeAccount(account);
+
+                                LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Edited data for employee with id " + GUI.getInstance().getLoggedEmployee().getIdEmp());
                             }
                         }
                     });

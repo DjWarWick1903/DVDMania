@@ -1,9 +1,6 @@
 package dvdmania.windows;
 
-import dvdmania.management.Stock;
-import dvdmania.management.StockManager;
-import dvdmania.management.Store;
-import dvdmania.management.StoreManager;
+import dvdmania.management.*;
 import dvdmania.tools.ExportExcel;
 
 import javax.swing.*;
@@ -73,11 +70,15 @@ public final class ExportStockWindow extends JFrame {
                 if (city.equals("Toate")) {
                     stocks = stockMan.getAllStock();
                     ExportExcel.getInstance().writeStockToExcel(stocks, null);
+                    LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Exported data for stocks");
+
                 } else {
                     final StoreManager storeMan = StoreManager.getInstance();
                     final Store store = storeMan.getStoreByCity(city);
                     stocks = stockMan.getAllStock(store);
                     ExportExcel.getInstance().writeStockToExcel(stocks, city);
+                    LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Exported data for stocks");
+
                 }
             }
         });

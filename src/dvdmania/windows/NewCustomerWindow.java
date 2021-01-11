@@ -1,9 +1,6 @@
 package dvdmania.windows;
 
-import dvdmania.management.Account;
-import dvdmania.management.AccountManager;
-import dvdmania.management.Client;
-import dvdmania.management.ClientManager;
+import dvdmania.management.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -166,6 +163,8 @@ public final class NewCustomerWindow extends JFrame {
                         if (accID != 0) {
                             final JFrame confirmDialog = new JFrame();
                             JOptionPane.showMessageDialog(confirmDialog, "Client data has been successfully uploaded.");
+                            LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Created client instance with id " + clID + " and account id " + accID);
+
                         } else {
                             final JFrame confirmDialog = new JFrame();
                             JOptionPane.showMessageDialog(confirmDialog, "There was a problem creating the account.");

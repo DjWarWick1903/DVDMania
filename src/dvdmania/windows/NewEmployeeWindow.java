@@ -194,6 +194,8 @@ public final class NewEmployeeWindow extends JFrame {
 
                     final JFrame confirmDialog = new JFrame();
                     JOptionPane.showMessageDialog(confirmDialog, "Your account has successfully been created!");
+                    LogManager.getInstance().insertLog(GUI.getInstance().getLoggedEmployee(), "Created employee instance with id " + emp.getIdEmp() + " and account id " + acc.getIdAcc());
+
                 }
             }
         });
